@@ -1,4 +1,5 @@
-import { requestAuthenticated } from "../spotifyApi";
+import { requestAuthenticated } from '../spotifyApi';
+import Request from '../utils/request';
 
 class TrackDetailsService {
   constructor() {
@@ -6,10 +7,14 @@ class TrackDetailsService {
     this.listeners = [];
   }
 
-  loadDetails(trackIds) {
-    return new Promise((resolve) => {
+  ensureLoaded(trackIds) {
+    return new Request((resolve, reject, request) => {
       const tick = () => {
-        const newTrackIds = trackIds.filter((trackId) => !this.cache.has(trackId));
+        const newTrackIds = trackIds.filter(trackId => !this.cache.has(trackId));
+        request.reportProgress({
+          loaded: trackIds.length - newTrackIds.length,
+          total: trackIds.length,
+        });
         if (newTrackIds.length) {
           const trackIdsToQuery = newTrackIds.slice(0, 100); // Maximum for the API
           requestAuthenticated({

@@ -29,6 +29,7 @@ export default class PlaylistEntries extends React.Component {
     super(props);
     this.state = {
       playlistEntriesRequest: null,
+      trackDetailsRequest: null,
     };
   }
 
@@ -43,27 +44,29 @@ export default class PlaylistEntries extends React.Component {
     playlistEntriesRequest.onProgress.push(() => {
       this.forceUpdate();
     });
-    playlistEntriesRequest._promise.then((playlistEntries) => {
+    playlistEntriesRequest.then((playlistEntries) => {
       this.setState({ playlistEntries });
+      this.loadTrackDetails();
     });
     this.setState({ playlistEntriesRequest });
   }
 
   loadTrackDetails() {
     const trackIds = this.state.playlistEntries.map(ple => ple.track.id);
-    this.setState({ loadingTrackDetails: true });
-    return TrackDetailsService.loadDetails(trackIds)
-      .then(() => {
-        this.setState({ loadingTrackDetails: false });
-      })
-      .catch((err) => {
-        console.error(err);
-        this.setState({ loadingTrackDetails: false });
-      });
+    if (!trackIds.length) return;
+    const trackDetailsRequest = TrackDetailsService.ensureLoaded(trackIds);
+
+    trackDetailsRequest.onProgress.push(() => {
+      this.forceUpdate();
+    });
+    trackDetailsRequest.then(() => {
+      this.setState({ trackDetailsRequest: null });
+    });
+    this.setState({ trackDetailsRequest });
   }
 
   render() {
-    const { playlistEntries, playlistEntriesRequest } = this.state;
+    const { playlistEntries, playlistEntriesRequest, trackDetailsRequest } = this.state;
     if (!playlistEntriesRequest) return null;
     if (!playlistEntriesRequest.result) {
       return (
@@ -75,11 +78,19 @@ export default class PlaylistEntries extends React.Component {
         />
       );
     }
+    let detailsStatus;
+    if (trackDetailsRequest) {
+      detailsStatus = (
+        <RequestStatus
+          request={trackDetailsRequest}
+          progressMessage="Loading track analysis..."
+          retry={() => this.loadTrackDetails()}
+        />
+      );
+    }
     return (
       <div>
-        <button onClick={() => this.loadTrackDetails()} disabled={this.state.loadingTrackDetails}>
-          Load track details...
-        </button>
+        {detailsStatus}
         <table>
           <thead>
           <tr>
@@ -102,7 +113,7 @@ export default class PlaylistEntries extends React.Component {
                 <td>{track.name}</td>
                 <td>{(track.album ? track.album.name : null)}</td>
                 <td>{formatDuration(track.duration_ms)}</td>
-                {details ? DETAILS_FIELDS.map(f => <th key={f}>{details[f]}</th>) : null}
+                {details ? DETAILS_FIELDS.map(f => <td key={f}>{details[f]}</td>) : null}
               </tr>
             );
           })}
