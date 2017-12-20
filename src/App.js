@@ -1,9 +1,9 @@
 import * as React from 'react';
 import { HashRouter, Route, Link } from 'react-router-dom';
 
-import PlaylistList from './views/PlaylistList';
 import { checkAndSaveAuth, getAuth, redirectToAuth } from './auth';
-import PlaylistView from './views/PlaylistView';
+import PlaylistListView from './views/PlaylistListView';
+import PlaylistContentView from './views/PlaylistContentView';
 
 export default class App extends React.Component {
   componentWillMount() {
@@ -27,8 +27,8 @@ export default class App extends React.Component {
             <Link to="/">Home</Link>
           </nav>
           <article>
-            <Route path="/playlist/:user_id/:playlist_id" component={PlaylistView}/>
-            <Route path="/" exact component={PlaylistList}/>
+            <Route path="/playlist/:user_id/:playlist_id" component={PlaylistContentView}/>
+            <Route path="/" exact component={PlaylistListView}/>
           </article>
         </div>
       </HashRouter>

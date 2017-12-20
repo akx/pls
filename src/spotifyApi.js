@@ -1,5 +1,6 @@
 import axios from 'axios/index';
 import { getAuth } from './auth';
+import Request from './utils/request';
 
 export function requestAuthenticated(options) {
   const auth = getAuth();
@@ -16,42 +17,35 @@ export function requestAuthenticated(options) {
 function loadPagedResource(url, params, limit, requestLimit = 50) {
   let offset = 0;
   const items = [];
-  const prom = new Promise((resolve, reject) => {
+  return new Request((resolve, reject, request) => {
     const tick = () => requestAuthenticated({
       url,
       params: Object.assign({}, params, { limit: requestLimit, offset }),
-    }).then(({ data }) => {
-      data.items.forEach((playlist) => {
-        items.push(playlist);
-      });
-      prom.progress = {
-        total: data.total,
-        loaded: items.length,
-        items,
-      };
-      if (prom.onProgress) {
-        prom.onProgress(prom);
-      }
-      if (prom.cancelRequested) {
-        // eslint-disable-next-line prefer-promise-reject-errors
-        reject({ cancel: true, items, progress: prom.progress });
-        return;
-      }
-      if (data.next && items.length < limit) {
-        offset += data.limit;
-        setTimeout(tick, 16);
-      } else {
-        resolve(items);
-      }
-    }).catch(reject);
+    })
+      .then(({ data }) => {
+        data.items.forEach((playlist) => {
+          items.push(playlist);
+        });
+        request.reportProgress({
+          total: data.total,
+          loaded: items.length,
+          items,
+        });
+        if (request.cancelRequested) {
+          // eslint-disable-next-line prefer-promise-reject-errors
+          reject({ cancel: true });
+          return;
+        }
+        if (data.next && items.length < limit) {
+          offset += data.limit;
+          setTimeout(tick, 16);
+        } else {
+          resolve(items);
+        }
+      })
+      .catch(reject);
     tick();
   });
-  prom.progress = {};
-  prom.onProgress = null;
-  prom.cancel = () => {
-    prom.cancelRequested = true;
-  };
-  return prom;
 }
 
 export function getPlaylists(limit = 0xFFFF) {
@@ -59,22 +53,25 @@ export function getPlaylists(limit = 0xFFFF) {
 }
 
 export function getPlaylist(userId, playlistId) {
-  return requestAuthenticated({
+  const plPromise = requestAuthenticated({
     url: `https://api.spotify.com/v1/users/${userId}/playlists/${playlistId}`,
   }).then(({ data }) => data);
+  return new Request(plPromise);
 }
 
 export function getPlaylistEntries(userId, playlistId, limit = 0xFFFF) {
-  return loadPagedResource(
+  const req = loadPagedResource(
     `https://api.spotify.com/v1/users/${userId}/playlists/${playlistId}/tracks`,
     {},
     limit,
     100,
-  ).then((entries) => {
+  );
+  req.then((entries) => {
     for (let i = 0; i < entries.length; i++) {
       // eslint-disable-next-line no-param-reassign
       entries[i].originalIndex = i;
     }
     return entries;
   });
+  return req;
 }

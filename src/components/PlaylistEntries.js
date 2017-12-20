@@ -1,6 +1,7 @@
 import React from 'react';
 import TrackDetailsService from '../services/TrackDetailsService';
 import { getPlaylistEntries } from "../spotifyApi";
+import RequestStatus from "./RequestStatus";
 
 const DETAILS_FIELDS = [
   'tempo',
@@ -27,43 +28,25 @@ export default class PlaylistEntries extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      loadingPlaylistEntries: true,
+      playlistEntriesRequest: null,
     };
-    this.trackLoadPromise = null;
   }
 
   componentDidMount() {
     this.loadPlaylistEntries();
   }
 
-
-  componentWillUnmount() {
-    if (this.state.loadingPlaylistEntries && this.trackLoadPromise) {
-      this.trackLoadPromise.cancel();
-      this.trackLoadPromise = null;
-    }
-  }
-
   loadPlaylistEntries() {
     const { playlist } = this.props;
-    if (this.trackLoadPromise) {
-      this.trackLoadPromise.cancel();
-      this.trackLoadPromise = null;
-    }
-    this.setState({ loadingPlaylistEntries: true });
-    const loader = getPlaylistEntries(playlist.owner.id, playlist.id);
-    loader.onProgress = (prom) => {
-      this.setState({ loadingPlaylistEntries: true, playlistEntriesProgress: Object.assign({}, prom.progress) });
-      console.log(prom.progress);
-    };
-    loader
-      .then((playlistEntries) => {
-        this.setState({ loadingPlaylistEntries: false, playlistEntriesProgress: null, playlistEntries });
-      })
-      .catch((error) => {
-        this.setState({ loadingPlaylistEntries: false, playlistEntriesProgress: null, playlistEntriesError: error });
-      });
-    this.trackLoadPromise = loader;
+    const playlistEntriesRequest = getPlaylistEntries(playlist.owner.id, playlist.id);
+
+    playlistEntriesRequest.onProgress.push(() => {
+      this.forceUpdate();
+    });
+    playlistEntriesRequest._promise.then((playlistEntries) => {
+      this.setState({ playlistEntries });
+    });
+    this.setState({ playlistEntriesRequest });
   }
 
   loadTrackDetails() {
@@ -80,28 +63,16 @@ export default class PlaylistEntries extends React.Component {
   }
 
   render() {
-    const { playlist } = this.props;
-    const { loadingPlaylistEntries, playlistEntries, playlistEntriesError, playlistEntriesProgress } = this.state;
-    if (playlistEntriesError) {
+    const { playlistEntries, playlistEntriesRequest } = this.state;
+    if (!playlistEntriesRequest) return null;
+    if (!playlistEntriesRequest.result) {
       return (
-        <Error
-          error={playlistEntriesError}
-          message="Oops, an error occurred loading the tracks in this playlist."
-          retry={() => this.loadPlaylistEntries()}
+        <RequestStatus
+          request={playlistEntriesRequest}
+          progressMessage="Loading playlist entries..."
+          errorMessage="Oops, an error occurred loading these entries."
+          retry={() => this.loadData()}
         />
-      );
-    }
-    if (loadingPlaylistEntries) {
-      return (
-        <div>
-          Loading playlist entries...
-          {playlistEntriesProgress ? (
-            <div>
-              <span>{playlistEntriesProgress.loaded}/{playlistEntriesProgress.total}</span>
-              <progress max={playlistEntriesProgress.total} value={playlistEntriesProgress.loaded}/>
-            </div>
-          ) : null}
-        </div>
       );
     }
     return (
@@ -112,6 +83,7 @@ export default class PlaylistEntries extends React.Component {
         <table>
           <thead>
           <tr>
+            <th>#</th>
             <th>Artist</th>
             <th>Track</th>
             <th>Album</th>
@@ -125,6 +97,7 @@ export default class PlaylistEntries extends React.Component {
             const details = TrackDetailsService.getDetails(track.id);
             return (
               <tr key={`${track.id}_${entry.originalIndex}`}>
+                <td>{entry.originalIndex + 1}</td>
                 <td>{track.artists.map((a) => a.name).join(', ')}</td>
                 <td>{track.name}</td>
                 <td>{(track.album ? track.album.name : null)}</td>

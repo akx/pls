@@ -1,12 +1,12 @@
 import * as React from 'react';
 import { Link } from 'react-router-dom';
 import { getPlaylists } from '../spotifyApi';
-import Error from '../components/Error';
+import RequestStatus from "../components/RequestStatus";
 
-export default class PlaylistList extends React.Component {
+export default class PlaylistListView extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { loading: false };
+    this.state = { playlistsRequest: null };
   }
 
   componentDidMount() {
@@ -14,25 +14,25 @@ export default class PlaylistList extends React.Component {
   }
 
   loadData() {
-    this.setState({ loading: true });
-    getPlaylists(10)
-      .then((playlists) => {
-        this.setState({ loading: false, playlists });
-      })
-      .catch((error) => {
-        this.setState({ loading: false, error });
-      });
+    const playlistsRequest = getPlaylists();
+    playlistsRequest.then((playlists) => {
+      this.setState({ playlists });
+    });
+    playlistsRequest.onProgress.push(() => {
+      this.forceUpdate();
+    });
+    this.setState({ playlistsRequest });
   }
 
   render() {
-    if (this.state.loading) {
-      return <div>Loading playlists...</div>;
-    }
-    if (this.state.error) {
+    const playlistsRequest = this.state.playlistsRequest;
+    if (!playlistsRequest) return null;
+    if (!playlistsRequest.result) {
       return (
-        <Error
-          error={this.state.error}
-          message="Oops, an error occurred loading your playlists."
+        <RequestStatus
+          request={playlistsRequest}
+          progressMessage="Loading {n} playlists..."
+          errorMessage="Oops, an error occurred loading your playlists."
           retry={() => this.loadData()}
         />
       );
