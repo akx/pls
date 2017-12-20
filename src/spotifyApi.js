@@ -64,17 +64,17 @@ export function getPlaylist(userId, playlistId) {
   }).then(({ data }) => data);
 }
 
-export function getPlaylistTracks(userId, playlistId, limit = 0xFFFF) {
+export function getPlaylistEntries(userId, playlistId, limit = 0xFFFF) {
   return loadPagedResource(
     `https://api.spotify.com/v1/users/${userId}/playlists/${playlistId}/tracks`,
     {},
     limit,
     100,
-  ).then((tracks) => {
-    for (let i = 0; i < tracks.length; i++) {
+  ).then((entries) => {
+    for (let i = 0; i < entries.length; i++) {
       // eslint-disable-next-line no-param-reassign
-      tracks[i].originalIndex = i;
+      entries[i].originalIndex = i;
     }
-    return tracks;
+    return entries;
   });
 }
