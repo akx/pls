@@ -1,7 +1,10 @@
 import React from 'react';
 import TrackDetailsService from '../services/TrackDetailsService';
-import { getPlaylistEntries } from "../spotifyApi";
-import RequestStatus from "./RequestStatus";
+import { getPlaylistEntries } from '../spotifyApi';
+import RequestStatus from './RequestStatus';
+import sortBy from 'lodash/sortBy';
+import get from 'lodash/get';
+import reverse from 'lodash/reverse';
 
 const DETAILS_FIELDS = [
   'tempo',
@@ -17,6 +20,10 @@ const DETAILS_FIELDS = [
   'valence',
 ];
 
+const RESORT_FIELDS = [
+  'duration_ms',
+].concat(DETAILS_FIELDS);
+
 const formatDuration = (ms) => {
   const totalSecs = Math.round(ms / 1000);
   const mins = Math.floor(totalSecs / 60);
@@ -30,6 +37,8 @@ export default class PlaylistEntries extends React.Component {
     this.state = {
       playlistEntriesRequest: null,
       trackDetailsRequest: null,
+      sort: 'original',
+      reverse: false,
     };
   }
 
@@ -88,9 +97,40 @@ export default class PlaylistEntries extends React.Component {
         />
       );
     }
+    let entries = [].concat(playlistEntries || []); // Always copy for reorderage
+    if (this.state.sort !== 'original') {
+      const sortKey = this.state.sort;
+      entries = sortBy(entries, entry => {
+        const details = TrackDetailsService.getDetails(entry.track.id);
+        return get(entry.track, sortKey) || get(details, sortKey);
+      });
+    }
+    if (this.state.reverse) {
+      entries = reverse(entries);
+    }
+
     return (
       <div>
         {detailsStatus}
+        <div>
+          <label>
+            <span>Sort</span>
+            <select
+              onChange={(e) => {
+                this.setState({ sort: e.target.value });
+              }}
+            >
+              <option value="original">Original sort</option>
+              {RESORT_FIELDS.map(f => <option key={f} value={f}>{f}</option>)}
+            </select>
+          </label>
+          <label>
+            <input type="checkbox" checked={this.state.reverse} onChange={(e) => {
+              this.setState({ reverse: e.target.checked });
+            }}/>
+            <span>Reverse</span>
+          </label>
+        </div>
         <table>
           <thead>
           <tr>
@@ -103,13 +143,13 @@ export default class PlaylistEntries extends React.Component {
           </tr>
           </thead>
           <tbody>
-          {(playlistEntries || []).map(entry => {
+          {entries.map((entry) => {
             const track = entry.track;
             const details = TrackDetailsService.getDetails(track.id);
             return (
-              <tr key={`${track.id}_${entry.originalIndex}`}>
+              <tr key={entry.originalIndex}>
                 <td>{entry.originalIndex + 1}</td>
-                <td>{track.artists.map((a) => a.name).join(', ')}</td>
+                <td>{track.artists.map(a => a.name).join(', ')}</td>
                 <td>{track.name}</td>
                 <td>{(track.album ? track.album.name : null)}</td>
                 <td>{formatDuration(track.duration_ms)}</td>
