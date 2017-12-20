@@ -46,3 +46,18 @@ table tbody tr:nth-child(2n+1) {
     background: #f7efdf;
 }
 
+.request-status {
+    padding: 1em;
+    background: #f7efdf;
+    width: 100%;
+    max-width: 900px;
+    margin: auto;
+}
+
+.request-status-progress-wrapper {
+    margin: 1em 0;
+}
+
+.request-status-progress-wrapper progress {
+    width: 100%;
+}
