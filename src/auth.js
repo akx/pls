@@ -38,3 +38,7 @@ export function checkAndSaveAuth() {
   }
   return null;
 }
+
+export function unauth() {
+  sessionStorage.plsAuth = 'null';
+}

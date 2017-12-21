@@ -1,7 +1,7 @@
 import React from 'react';
 import { HashRouter, Route, Link } from 'react-router-dom';
 
-import { checkAndSaveAuth, getAuth, redirectToAuth } from './auth';
+import { checkAndSaveAuth, getAuth, redirectToAuth, unauth } from './auth';
 import PlaylistListView from './views/PlaylistListView';
 import PlaylistContentView from './views/PlaylistContentView';
 
@@ -24,7 +24,17 @@ export default class App extends React.Component {
       <HashRouter>
         <div>
           <nav>
-            <Link to="/">Home</Link>
+            <Link to="/">List Playlists</Link>
+            <a
+              href="#"
+              onClick={(e) => {
+                unauth();
+                this.forceUpdate();
+                e.preventDefault();
+              }}
+            >
+              Logout
+            </a>
           </nav>
           <article>
             <Route path="/playlist/:user_id/:playlist_id" component={PlaylistContentView} />

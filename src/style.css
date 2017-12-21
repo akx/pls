@@ -22,6 +22,11 @@ nav {
 
 nav a {
     color: #fff;
+    margin-right: 1em;
+}
+
+nav a:hover {
+    text-decoration: underline;
 }
 
 article {
