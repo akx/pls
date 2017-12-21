@@ -1,6 +1,10 @@
 /* #092140, #024959, #F2C777, #F24738, #BF2A2A */
 @import url('https://fonts.googleapis.com/css?family=Roboto+Condensed');
 
+* {
+    box-sizing: border-box;
+}
+
 body {
     margin: 0;
 }
@@ -28,21 +32,21 @@ body, input, button {
     font: 12pt/1.1 'Roboto Condensed', sans-serif;
 }
 
-table {
+table.visual-table {
     width: 100%;
     border-collapse: collapse;
 }
 
-td, th {
+table.visual-table td, table.visual-table th {
     text-align: left;
     padding: 3px;
 }
 
-th {
+table.visual-table th {
     border-bottom: 1px solid #f2c777;
 }
 
-table tbody tr:nth-child(2n+1) {
+table.visual-table tbody tr:nth-child(2n+1) {
     background: #f7efdf;
 }
 
@@ -75,4 +79,24 @@ table tbody tr:nth-child(2n+1) {
     color: #fff;
     border: none;
     border-radius: 2em;
+}
+
+.sort-and-filter .filters {
+    display: flex;
+}
+
+.sort-and-filter .filter {
+    flex: 1;
+    margin: 0.25em;
+    padding: 0.25em;
+    background: #fff;
+    box-shadow: 0px 7px 5px -7px rgba(0, 0, 0, 0.5);
+}
+
+.sort-and-filter input[type=number] {
+    width: 100%;
+}
+
+.sort-and-filter .filter span {
+    display: block;
 }

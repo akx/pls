@@ -38,7 +38,7 @@ export default class PlaylistListView extends React.Component {
       );
     }
     return (
-      <table>
+      <table className="visual-table">
         <thead>
         <tr>
           <th>Name</th>

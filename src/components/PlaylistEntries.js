@@ -2,6 +2,9 @@ import React from 'react';
 import sortBy from 'lodash/sortBy';
 import get from 'lodash/get';
 import reverse from 'lodash/reverse';
+import toPairs from 'lodash/toPairs';
+import title from 'lodash/upperFirst';
+import update from 'immutability-helper';
 
 import TrackDetailsService from '../services/TrackDetailsService';
 import { getPlaylistEntries } from '../spotifyApi';
@@ -32,32 +35,85 @@ const formatDuration = (ms) => {
   return `${mins}:${secs.toString().padStart(2, '0')}`;
 };
 
+const formatTitle = f => title(f).replace('_', ' ');
+
 class SortAndFilterForm extends React.Component {
   render() {
-    return (
-      <div>
-        <label>
-          <span>Sort</span>
-          <select
-            value={this.props.sort}
-            onChange={(e) => {
-              this.props.setValue('sort', e.target.value);
-            }}
-          >
-            <option value="original">Original sort</option>
-            {RESORT_FIELDS.map(f => <option key={f} value={f}>{f}</option>)}
-          </select>
-        </label>
-        <label>
+    const lteFields = [];
+    const gteFields = [];
+    RESORT_FIELDS.forEach(f => {
+      gteFields.push((
+        <td key={f}>
           <input
-            type="checkbox"
-            checked={this.props.reverse}
+            type="number"
+            value={this.props.filters[`${f}:gte`] || ''}
+            size={3}
             onChange={(e) => {
-              this.props.setValue('reverse', e.target.checked);
+              this.props.setFilterValue(`${f}:gte`, e.target.value);
             }}
           />
-          <span>Reverse</span>
-        </label>
+        </td>
+      ));
+      lteFields.push((
+        <td key={f}>
+          <input
+            type="number"
+            value={this.props.filters[`${f}:lte`] || ''}
+            size={3}
+            onChange={(e) => {
+              this.props.setFilterValue(`${f}:lte`, e.target.value);
+            }}
+          />
+        </td>
+      ));
+    });
+    return (
+      <div className="sort-and-filter">
+        <div className="sort">
+          <label>
+            <span>Sort</span>
+            <select
+              value={this.props.sort}
+              onChange={(e) => {
+                this.props.setValue('sort', e.target.value);
+              }}
+            >
+              <option value="original">Original sort</option>
+              {RESORT_FIELDS.map(f => <option key={f} value={f}>{f}</option>)}
+            </select>
+          </label>
+          <label>
+            <input
+              type="checkbox"
+              checked={this.props.reverse}
+              onChange={(e) => {
+                this.props.setValue('reverse', e.target.checked);
+              }}
+            />
+            <span>Reverse</span>
+          </label>
+        </div>
+        <div className="filters">
+          <table>
+            <thead>
+              <tr>
+                <th />
+                {RESORT_FIELDS.map(f => <th key={f}>{formatTitle(f)}</th>)}
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>≥</td>
+                {gteFields}
+              </tr>
+              <tr>
+                <td>≤</td>
+                {lteFields}
+              </tr>
+            </tbody>
+          </table>
+
+        </div>
       </div>
     );
   }
@@ -71,6 +127,7 @@ export default class PlaylistEntries extends React.Component {
       trackDetailsRequest: null,
       sort: 'original',
       reverse: false,
+      filters: {},
     };
   }
 
@@ -137,11 +194,15 @@ export default class PlaylistEntries extends React.Component {
         <SortAndFilterForm
           sort={this.state.sort}
           reverse={this.state.reverse}
-          setValue={(key, value) => {
-            return this.setState({ [key]: value });
+          filters={this.state.filters}
+          setValue={(key, value) => this.setState({ [key]: value })}
+          setFilterValue={(key, value) => {
+            const updateCommand = (value === '' ? { $unset: [key] } : { [key]: { $set: value } });
+            const newFilters = update(this.state.filters, updateCommand);
+            return this.setState({ filters: newFilters });
           }}
         />
-        <table>
+        <table className="visual-table">
           <thead>
             <tr>
               <th>#</th>
@@ -149,7 +210,7 @@ export default class PlaylistEntries extends React.Component {
               <th>Track</th>
               <th>Album</th>
               <th>Duration</th>
-              {DETAILS_FIELDS.map(f => <th key={f}>{f}</th>)}
+              {DETAILS_FIELDS.map(f => <th key={f}>{formatTitle(f)}</th>)}
             </tr>
           </thead>
           <tbody>
@@ -170,12 +231,26 @@ export default class PlaylistEntries extends React.Component {
   }
 
   sortAndFilterEntries(playlistEntries) {
+    const filterPairs = toPairs(this.state.filters).filter(([, value]) => value !== '');
+    const filterEntry = entry => (
+      filterPairs.every(([key, value]) => {
+        const filterValue = parseFloat(value);
+        if (Number.isNaN(filterValue)) return true;
+        const [field, op] = key.split(':');
+        const objectValue = entry[field];
+        if (objectValue === undefined) return false;
+        if (op === 'gte') return objectValue >= filterValue;
+        if (op === 'lte') return objectValue <= filterValue;
+        console.warn(key, field, op, value);
+        return true;
+      })
+    );
     let entries = (playlistEntries || []).map(ple => Object.assign(
       {},
       ple,
       ple.track,
       TrackDetailsService.getDetails(ple.track.id) || {},
-    ));
+    )).filter(filterEntry);
     if (this.state.sort !== 'original') {
       const sortKey = this.state.sort;
       entries = sortBy(entries, entry => get(entry, sortKey));
