@@ -1,4 +1,5 @@
 *.log
 .env
 .idea
+dist
 node_modules
