@@ -1,10 +1,11 @@
 import React from 'react';
-import TrackDetailsService from '../services/TrackDetailsService';
-import { getPlaylistEntries } from '../spotifyApi';
-import RequestStatus from './RequestStatus';
 import sortBy from 'lodash/sortBy';
 import get from 'lodash/get';
 import reverse from 'lodash/reverse';
+
+import TrackDetailsService from '../services/TrackDetailsService';
+import { getPlaylistEntries } from '../spotifyApi';
+import RequestStatus from './RequestStatus';
 
 const DETAILS_FIELDS = [
   'tempo',
@@ -30,6 +31,37 @@ const formatDuration = (ms) => {
   const secs = totalSecs % 60;
   return `${mins}:${secs.toString().padStart(2, '0')}`;
 };
+
+class SortAndFilterForm extends React.Component {
+  render() {
+    return (
+      <div>
+        <label>
+          <span>Sort</span>
+          <select
+            value={this.props.sort}
+            onChange={(e) => {
+              this.props.setValue('sort', e.target.value);
+            }}
+          >
+            <option value="original">Original sort</option>
+            {RESORT_FIELDS.map(f => <option key={f} value={f}>{f}</option>)}
+          </select>
+        </label>
+        <label>
+          <input
+            type="checkbox"
+            checked={this.props.reverse}
+            onChange={(e) => {
+              this.props.setValue('reverse', e.target.checked);
+            }}
+          />
+          <span>Reverse</span>
+        </label>
+      </div>
+    );
+  }
+}
 
 export default class PlaylistEntries extends React.Component {
   constructor(props) {
@@ -97,69 +129,60 @@ export default class PlaylistEntries extends React.Component {
         />
       );
     }
-    let entries = [].concat(playlistEntries || []); // Always copy for reorderage
-    if (this.state.sort !== 'original') {
-      const sortKey = this.state.sort;
-      entries = sortBy(entries, entry => {
-        const details = TrackDetailsService.getDetails(entry.track.id);
-        return get(entry.track, sortKey) || get(details, sortKey);
-      });
-    }
-    if (this.state.reverse) {
-      entries = reverse(entries);
-    }
+    const entries = this.sortAndFilterEntries(playlistEntries);
 
     return (
       <div>
         {detailsStatus}
-        <div>
-          <label>
-            <span>Sort</span>
-            <select
-              onChange={(e) => {
-                this.setState({ sort: e.target.value });
-              }}
-            >
-              <option value="original">Original sort</option>
-              {RESORT_FIELDS.map(f => <option key={f} value={f}>{f}</option>)}
-            </select>
-          </label>
-          <label>
-            <input type="checkbox" checked={this.state.reverse} onChange={(e) => {
-              this.setState({ reverse: e.target.checked });
-            }}/>
-            <span>Reverse</span>
-          </label>
-        </div>
+        <SortAndFilterForm
+          sort={this.state.sort}
+          reverse={this.state.reverse}
+          setValue={(key, value) => {
+            return this.setState({ [key]: value });
+          }}
+        />
         <table>
           <thead>
-          <tr>
-            <th>#</th>
-            <th>Artist</th>
-            <th>Track</th>
-            <th>Album</th>
-            <th>Duration</th>
-            {DETAILS_FIELDS.map(f => <th key={f}>{f}</th>)}
-          </tr>
+            <tr>
+              <th>#</th>
+              <th>Artist</th>
+              <th>Track</th>
+              <th>Album</th>
+              <th>Duration</th>
+              {DETAILS_FIELDS.map(f => <th key={f}>{f}</th>)}
+            </tr>
           </thead>
           <tbody>
-          {entries.map((entry) => {
-            const track = entry.track;
-            const details = TrackDetailsService.getDetails(track.id);
-            return (
+            {entries.map(entry => (
               <tr key={entry.originalIndex}>
                 <td>{entry.originalIndex + 1}</td>
-                <td>{track.artists.map(a => a.name).join(', ')}</td>
-                <td>{track.name}</td>
-                <td>{(track.album ? track.album.name : null)}</td>
-                <td>{formatDuration(track.duration_ms)}</td>
-                {details ? DETAILS_FIELDS.map(f => <td key={f}>{details[f]}</td>) : null}
+                <td>{entry.artists.map(a => a.name).join(', ')}</td>
+                <td>{entry.name}</td>
+                <td>{(entry.album ? entry.album.name : null)}</td>
+                <td>{formatDuration(entry.duration_ms)}</td>
+                {DETAILS_FIELDS.map(f => <td key={f}>{entry[f]}</td>)}
               </tr>
-            );
-          })}
+            ))}
           </tbody>
         </table>
       </div>
     );
+  }
+
+  sortAndFilterEntries(playlistEntries) {
+    let entries = (playlistEntries || []).map(ple => Object.assign(
+      {},
+      ple,
+      ple.track,
+      TrackDetailsService.getDetails(ple.track.id) || {},
+    ));
+    if (this.state.sort !== 'original') {
+      const sortKey = this.state.sort;
+      entries = sortBy(entries, entry => get(entry, sortKey));
+    }
+    if (this.state.reverse) {
+      entries = reverse(entries);
+    }
+    return entries;
   }
 }
