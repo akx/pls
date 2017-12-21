@@ -5,7 +5,7 @@
   "license": "MIT",
   "scripts": {
     "dev": "poi",
-    "dist": "poi build",
+    "dist": "rm -fr dist && poi build && ghpg -d dist",
     "lint": "eslint src"
   },
   "dependencies": {
