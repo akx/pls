@@ -61,3 +61,18 @@ table tbody tr:nth-child(2n+1) {
 .request-status-progress-wrapper progress {
     width: 100%;
 }
+
+.please-auth {
+    margin: 1em;
+    padding: 1em;
+    text-align: center;
+}
+
+.please-auth button {
+    height: 4em;
+    padding: 0 2em;
+    background: #26B857;
+    color: #fff;
+    border: none;
+    border-radius: 2em;
+}

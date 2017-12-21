@@ -14,7 +14,7 @@ export default ({ request, progressMessage, errorMessage, retry }) => {
     return (
       <div className="request-status">
         <div className="request-status-message">
-          {(progressMessage || 'Loading').replace('{n}', progress && progress.total ? `${progress.total}` : '')}...
+          {(progressMessage || 'Loading').replace('{n}', progress && progress.total ? `${progress.total}` : '')}
         </div>
         {progress && progress.loaded ? (
           <div className="request-status-progress-wrapper">

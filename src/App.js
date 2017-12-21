@@ -14,7 +14,7 @@ export default class App extends React.Component {
     const auth = getAuth();
     if (!auth) {
       return (
-        <div>
+        <div className="please-auth">
           <p>You have not authenticated with Spotify, or your authentication has expired.</p>
           <button onClick={() => redirectToAuth()}>Authenticate</button>
         </div>
