@@ -86,8 +86,8 @@ table.visual-table tbody tr:nth-child(2n+1) {
     border-radius: 2em;
 }
 
-.sort-and-filter .filters {
-    display: flex;
+.sort-and-filter .filters table {
+    width: 100%;
 }
 
 .sort-and-filter .filter {

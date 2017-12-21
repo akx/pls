@@ -10,6 +10,7 @@ export const DETAILS_FIELDS = [
   'loudness',
   'speechiness',
   'valence',
+  'popularity',
 ];
 
 export const RESORT_FIELDS = [
