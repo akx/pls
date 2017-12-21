@@ -1,3 +1,4 @@
+/* eslint-disable no-param-reassign,no-console */
 import { requestAuthenticated } from '../spotifyApi';
 import Request from '../utils/request';
 
@@ -8,6 +9,7 @@ class TrackDetailsService {
   }
 
   ensureLoaded(trackIds) {
+    trackIds = trackIds.filter(id => id);
     return new Request((resolve, reject, request) => {
       const tick = () => {
         const newTrackIds = trackIds.filter(trackId => !this.cache.has(trackId));
@@ -25,7 +27,15 @@ class TrackDetailsService {
           })
             .then((resp) => {
               resp.data.audio_features.forEach((fobj) => {
-                this.cache.set(fobj.id, fobj);
+                if (fobj) {
+                  this.cache.set(fobj.id, fobj);
+                }
+              });
+              trackIdsToQuery.forEach((id) => {
+                if (!this.cache.has(id)) {
+                  console.warn(`No analysis available for ${id}`);
+                  this.cache.set(id, {});
+                }
               });
               setTimeout(tick, 16);
             });
