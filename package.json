@@ -27,6 +27,7 @@
     "eslint-plugin-import": "^2.8.0",
     "eslint-plugin-jsx-a11y": "^6.0.3",
     "eslint-plugin-react": "^7.5.1",
+    "ghpg": "^1.0.1",
     "nodemon": "^1.14.0",
     "poi": "^9.6.2",
     "poi-preset-react": "^9.2.1"

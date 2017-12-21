@@ -16,7 +16,14 @@ export function redirectToAuth() {
   location.href = (`https://accounts.spotify.com/authorize?${qs.stringify({
     response_type: 'token',
     client_id: process.env.SPOTIFY_CLIENT_ID,
-    scope: 'user-read-private playlist-modify-private playlist-modify-public',
+    scope: [
+      'user-read-private',
+      'playlist-modify-private',
+      'playlist-modify-public',
+      'playlist-read-private',
+      'playlist-read-collaborative',
+    ].join(' '),
+    show_dialog: true,
     redirect_uri: location.href.replace(/[?#]+.*/g, ''),
   })}`);
 }
