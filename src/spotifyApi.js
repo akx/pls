@@ -1,7 +1,8 @@
 import axios from 'axios/index';
+import chunk from 'lodash/chunk';
+
 import { getAuth } from './auth';
 import Request from './utils/request';
-import chunk from 'lodash/chunk';
 
 export function requestAuthenticated(options) {
   const auth = getAuth();
@@ -68,7 +69,7 @@ export function getPlaylistEntries(userId, playlistId, limit = 0xFFFF) {
     100,
   );
   req.then((entries) => {
-    for (let i = 0; i < entries.length; i++) {
+    for (let i = 0; i < entries.length; i += 1) {
       // eslint-disable-next-line no-param-reassign
       entries[i].originalIndex = i;
     }

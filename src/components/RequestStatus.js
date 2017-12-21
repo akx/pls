@@ -1,4 +1,9 @@
-export default ({ request, progressMessage, errorMessage, retry }) => {
+import React from 'react';
+import Error from './Error';
+
+export default ({
+  request, progressMessage, errorMessage, retry,
+}) => {
   if (!request) return null;
   if (request.error) {
     return (
@@ -10,7 +15,7 @@ export default ({ request, progressMessage, errorMessage, retry }) => {
     );
   }
   if (request.busy) {
-    const progress = request.progress;
+    const { progress } = request;
     return (
       <div className="request-status">
         <div className="request-status-message">
@@ -19,7 +24,7 @@ export default ({ request, progressMessage, errorMessage, retry }) => {
         {progress && progress.loaded ? (
           <div className="request-status-progress-wrapper">
             <span>{progress.loaded}/{progress.total}</span>
-            <progress max={progress.total} value={progress.loaded}/>
+            <progress max={progress.total} value={progress.loaded} />
           </div>
         ) : null}
       </div>

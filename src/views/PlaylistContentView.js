@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { getPlaylist } from '../spotifyApi';
 import PlaylistEntries from '../components/PlaylistEntries';
 import RequestStatus from '../components/RequestStatus';
@@ -15,7 +15,7 @@ export default class PlaylistContentView extends React.Component {
 
 
   loadData() {
-    const params = this.props.match.params;
+    const { params } = this.props.match;
     const userId = params.user_id;
     const playlistId = params.playlist_id;
     const playlistRequest = getPlaylist(userId, playlistId);
@@ -26,7 +26,7 @@ export default class PlaylistContentView extends React.Component {
   }
 
   render() {
-    const playlistRequest = this.state.playlistRequest;
+    const { playlistRequest } = this.state;
     if (!playlistRequest) return null;
     if (!playlistRequest.result) {
       return (
@@ -45,7 +45,7 @@ export default class PlaylistContentView extends React.Component {
     return (
       <div>
         <h1>{playlist.name}</h1>
-        <PlaylistEntries playlist={playlist}/>
+        <PlaylistEntries playlist={playlist} />
       </div>
     );
   }

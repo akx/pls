@@ -1,3 +1,5 @@
+import React from 'react';
+
 export default ({ error, message, retry }) => (
   <div>
     {message}

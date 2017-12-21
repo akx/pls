@@ -1,125 +1,19 @@
+/* eslint-disable no-alert,no-console */
 import React from 'react';
 import sortBy from 'lodash/sortBy';
 import get from 'lodash/get';
 import reverse from 'lodash/reverse';
 import toPairs from 'lodash/toPairs';
-import upperFirst from 'lodash/upperFirst';
 import update from 'immutability-helper';
 
-import TrackDetailsService from '../services/TrackDetailsService';
-import { createPlaylistWithTracks, getPlaylistEntries, requestAuthenticated } from '../spotifyApi';
 import RequestStatus from './RequestStatus';
+import SortAndFilterForm from './SortAndFilterForm';
 
-const DETAILS_FIELDS = [
-  'tempo',
-  'time_signature',
-  'key',
-  'mode',
-  'acousticness',
-  'danceability',
-  'energy',
-  'instrumentalness',
-  'loudness',
-  'speechiness',
-  'valence',
-];
+import TrackDetailsService from '../services/TrackDetailsService';
+import { createPlaylistWithTracks, getPlaylistEntries } from '../spotifyApi';
+import { DETAILS_FIELDS } from '../consts';
+import { formatDuration, formatTitle } from '../utils/format';
 
-const RESORT_FIELDS = [
-  'name',
-  'duration_ms',
-].concat(DETAILS_FIELDS);
-
-const formatDuration = (ms) => {
-  const totalSecs = Math.round(ms / 1000);
-  const mins = Math.floor(totalSecs / 60);
-  const secs = totalSecs % 60;
-  return `${mins}:${secs.toString().padStart(2, '0')}`;
-};
-
-const formatTitle = f => (f === 'time_signature' ? 'Timesig' : upperFirst(f).replace('_', ' '));
-
-class SortAndFilterForm extends React.Component {
-  render() {
-    const lteFields = [];
-    const gteFields = [];
-    RESORT_FIELDS.forEach((f) => {
-      gteFields.push((
-        <td key={f}>
-          <input
-            type="number"
-            value={this.props.filters[`${f}:gte`] || ''}
-            size={3}
-            onChange={(e) => {
-              this.props.setFilterValue(`${f}:gte`, e.target.value);
-            }}
-          />
-        </td>
-      ));
-      lteFields.push((
-        <td key={f}>
-          <input
-            type="number"
-            value={this.props.filters[`${f}:lte`] || ''}
-            size={3}
-            onChange={(e) => {
-              this.props.setFilterValue(`${f}:lte`, e.target.value);
-            }}
-          />
-        </td>
-      ));
-    });
-    return (
-      <fieldset className="sort-and-filter">
-        <legend>Sort & Filter</legend>
-        <div className="sort">
-          <label>
-            <span>Sort</span>
-            <select
-              value={this.props.sort}
-              onChange={(e) => {
-                this.props.setValue('sort', e.target.value);
-              }}
-            >
-              <option value="original">Original sort</option>
-              {RESORT_FIELDS.map(f => <option key={f} value={f}>{formatTitle(f)}</option>)}
-            </select>
-          </label>
-          <label>
-            <input
-              type="checkbox"
-              checked={this.props.reverse}
-              onChange={(e) => {
-                this.props.setValue('reverse', e.target.checked);
-              }}
-            />
-            <span>Reverse</span>
-          </label>
-        </div>
-        <div className="filters">
-          <table>
-            <thead>
-              <tr>
-                <th />
-                {RESORT_FIELDS.map(f => <th key={f}>{formatTitle(f)}</th>)}
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>≥</td>
-                {gteFields}
-              </tr>
-              <tr>
-                <td>≤</td>
-                {lteFields}
-              </tr>
-            </tbody>
-          </table>
-
-        </div>
-      </fieldset>
-    );
-  }
-}
 
 export default class PlaylistEntries extends React.Component {
   constructor(props) {
@@ -165,13 +59,14 @@ export default class PlaylistEntries extends React.Component {
     this.setState({ trackDetailsRequest });
   }
 
+  // eslint-disable-next-line class-methods-use-this
   createNewPlaylist(tracks) {
     const title = prompt('What should the new playlist be called?');
     if (!title) {
       return false;
     }
     const spotifyUris = tracks.map(track => track.uri).filter(uri => uri);
-    createPlaylistWithTracks(title, spotifyUris)
+    return createPlaylistWithTracks(title, spotifyUris)
       .then(() => {
         alert('Playlist successfully created. :)');
       })
@@ -182,7 +77,7 @@ export default class PlaylistEntries extends React.Component {
   }
 
   downloadEntriesJSON(tracks) {
-    const playlist = this.props.playlist;
+    const { playlist } = this.props;
     const jsonData = JSON.stringify(tracks, null, 2);
     const blob = new Blob([jsonData], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
@@ -195,6 +90,38 @@ export default class PlaylistEntries extends React.Component {
     setTimeout(() => {
       downloadLink.parentNode.removeChild(downloadLink);
     }, 500);
+  }
+
+  sortAndFilterEntries(playlistEntries) {
+    const filterPairs = toPairs(this.state.filters).filter(([, value]) => value !== '');
+    const filterEntry = entry => (
+      filterPairs.every(([key, value]) => {
+        const filterValue = parseFloat(value);
+        if (Number.isNaN(filterValue)) return true;
+        const [field, op] = key.split(':');
+        const objectValue = entry[field];
+        if (objectValue === undefined) return false;
+        if (op === 'gte') return objectValue >= filterValue;
+        if (op === 'lte') return objectValue <= filterValue;
+        console.warn(key, field, op, value);
+        return true;
+      })
+    );
+    let entries = (playlistEntries || []).map(ple => Object.assign(
+      {},
+      ple,
+      ple.track,
+      TrackDetailsService.getDetails(ple.track.id) || {},
+      { track: null },
+    )).filter(filterEntry);
+    if (this.state.sort !== 'original') {
+      const sortKey = this.state.sort;
+      entries = sortBy(entries, entry => get(entry, sortKey));
+    }
+    if (this.state.reverse) {
+      entries = reverse(entries);
+    }
+    return entries;
   }
 
   render() {
@@ -277,37 +204,5 @@ export default class PlaylistEntries extends React.Component {
         </table>
       </div>
     );
-  }
-
-  sortAndFilterEntries(playlistEntries) {
-    const filterPairs = toPairs(this.state.filters).filter(([, value]) => value !== '');
-    const filterEntry = entry => (
-      filterPairs.every(([key, value]) => {
-        const filterValue = parseFloat(value);
-        if (Number.isNaN(filterValue)) return true;
-        const [field, op] = key.split(':');
-        const objectValue = entry[field];
-        if (objectValue === undefined) return false;
-        if (op === 'gte') return objectValue >= filterValue;
-        if (op === 'lte') return objectValue <= filterValue;
-        console.warn(key, field, op, value);
-        return true;
-      })
-    );
-    let entries = (playlistEntries || []).map(ple => Object.assign(
-      {},
-      ple,
-      ple.track,
-      TrackDetailsService.getDetails(ple.track.id) || {},
-      { track: null },
-    )).filter(filterEntry);
-    if (this.state.sort !== 'original') {
-      const sortKey = this.state.sort;
-      entries = sortBy(entries, entry => get(entry, sortKey));
-    }
-    if (this.state.reverse) {
-      entries = reverse(entries);
-    }
-    return entries;
   }
 }
