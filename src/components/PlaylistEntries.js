@@ -3,11 +3,11 @@ import sortBy from 'lodash/sortBy';
 import get from 'lodash/get';
 import reverse from 'lodash/reverse';
 import toPairs from 'lodash/toPairs';
-import title from 'lodash/upperFirst';
+import upperFirst from 'lodash/upperFirst';
 import update from 'immutability-helper';
 
 import TrackDetailsService from '../services/TrackDetailsService';
-import { getPlaylistEntries } from '../spotifyApi';
+import { createPlaylistWithTracks, getPlaylistEntries, requestAuthenticated } from '../spotifyApi';
 import RequestStatus from './RequestStatus';
 
 const DETAILS_FIELDS = [
@@ -25,6 +25,7 @@ const DETAILS_FIELDS = [
 ];
 
 const RESORT_FIELDS = [
+  'name',
   'duration_ms',
 ].concat(DETAILS_FIELDS);
 
@@ -35,13 +36,13 @@ const formatDuration = (ms) => {
   return `${mins}:${secs.toString().padStart(2, '0')}`;
 };
 
-const formatTitle = f => title(f).replace('_', ' ');
+const formatTitle = f => (f === 'time_signature' ? 'Timesig' : upperFirst(f).replace('_', ' '));
 
 class SortAndFilterForm extends React.Component {
   render() {
     const lteFields = [];
     const gteFields = [];
-    RESORT_FIELDS.forEach(f => {
+    RESORT_FIELDS.forEach((f) => {
       gteFields.push((
         <td key={f}>
           <input
@@ -68,7 +69,8 @@ class SortAndFilterForm extends React.Component {
       ));
     });
     return (
-      <div className="sort-and-filter">
+      <fieldset className="sort-and-filter">
+        <legend>Sort & Filter</legend>
         <div className="sort">
           <label>
             <span>Sort</span>
@@ -79,7 +81,7 @@ class SortAndFilterForm extends React.Component {
               }}
             >
               <option value="original">Original sort</option>
-              {RESORT_FIELDS.map(f => <option key={f} value={f}>{f}</option>)}
+              {RESORT_FIELDS.map(f => <option key={f} value={f}>{formatTitle(f)}</option>)}
             </select>
           </label>
           <label>
@@ -114,7 +116,7 @@ class SortAndFilterForm extends React.Component {
           </table>
 
         </div>
-      </div>
+      </fieldset>
     );
   }
 }
@@ -163,6 +165,38 @@ export default class PlaylistEntries extends React.Component {
     this.setState({ trackDetailsRequest });
   }
 
+  createNewPlaylist(tracks) {
+    const title = prompt('What should the new playlist be called?');
+    if (!title) {
+      return false;
+    }
+    const spotifyUris = tracks.map(track => track.uri).filter(uri => uri);
+    createPlaylistWithTracks(title, spotifyUris)
+      .then(() => {
+        alert('Playlist successfully created. :)');
+      })
+      .catch((err) => {
+        console.error(err);
+        alert(`Error creating playlist: ${err}`);
+      });
+  }
+
+  downloadEntriesJSON(tracks) {
+    const playlist = this.props.playlist;
+    const jsonData = JSON.stringify(tracks, null, 2);
+    const blob = new Blob([jsonData], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const downloadLink = Object.assign(document.createElement('a'), {
+      href: url,
+      download: `pls-${playlist.name}.json`,
+    });
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    setTimeout(() => {
+      downloadLink.parentNode.removeChild(downloadLink);
+    }, 500);
+  }
+
   render() {
     const { playlistEntries, playlistEntriesRequest, trackDetailsRequest } = this.state;
     if (!playlistEntriesRequest) return null;
@@ -202,6 +236,21 @@ export default class PlaylistEntries extends React.Component {
             return this.setState({ filters: newFilters });
           }}
         />
+        <fieldset>
+          <legend>Tools</legend>
+          <button
+            disabled={entries.length === 0}
+            onClick={() => this.createNewPlaylist(entries)}
+          >
+            Create New Playlist of {entries.length} Tracks
+          </button>
+          <button
+            disabled={entries.length === 0}
+            onClick={() => this.downloadEntriesJSON(entries)}
+          >
+            Export JSON Track Data
+          </button>
+        </fieldset>
         <table className="visual-table">
           <thead>
             <tr>
@@ -250,6 +299,7 @@ export default class PlaylistEntries extends React.Component {
       ple,
       ple.track,
       TrackDetailsService.getDetails(ple.track.id) || {},
+      { track: null },
     )).filter(filterEntry);
     if (this.state.sort !== 'original') {
       const sortKey = this.state.sort;

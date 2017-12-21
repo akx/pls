@@ -1,6 +1,7 @@
 import axios from 'axios/index';
 import { getAuth } from './auth';
 import Request from './utils/request';
+import chunk from 'lodash/chunk';
 
 export function requestAuthenticated(options) {
   const auth = getAuth();
@@ -74,4 +75,43 @@ export function getPlaylistEntries(userId, playlistId, limit = 0xFFFF) {
     return entries;
   });
   return req;
+}
+
+export function createPlaylistWithTracks(title, spotifyUris) {
+  return requestAuthenticated({ method: 'GET', url: 'https://api.spotify.com/v1/me' })
+    .then((userResp) => {
+      const userData = userResp.data;
+      const userName = userData.id;
+      return requestAuthenticated({
+        method: 'POST',
+        url: `https://api.spotify.com/v1/users/${userName}/playlists`,
+        data: {
+          name: title,
+          description: `Playlist created by pls by @akx on ${new Date().toISOString()}`,
+          public: false,
+        },
+      }).then((resp) => {
+        const newPlaylistId = resp.data.id;
+        const spotifyUriChunks = chunk(spotifyUris, 100);
+        return new Promise((resolve) => {
+          const tick = () => {
+            if (!spotifyUriChunks.length) {
+              resolve(true);
+              return;
+            }
+            const spotifyUriChunk = spotifyUriChunks.shift();
+            requestAuthenticated({
+              method: 'POST',
+              url: `https://api.spotify.com/v1/users/${userName}/playlists/${newPlaylistId}/tracks`,
+              data: {
+                uris: spotifyUriChunk,
+              },
+            }).then(() => {
+              setTimeout(tick, 16);
+            });
+          };
+          tick();
+        });
+      });
+    });
 }

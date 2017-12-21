@@ -28,7 +28,7 @@ article {
     padding: 0.5em;
 }
 
-body, input, button {
+body, input, button, select {
     font: 12pt/1.1 'Roboto Condensed', sans-serif;
 }
 
