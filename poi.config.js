@@ -7,7 +7,7 @@ if (!process.env.SPOTIFY_CLIENT_ID) {
 }
 
 
-module.exports = {
+module.exports = (options, req) => ({
   presets: [
     ReactPreset(),
   ],
@@ -15,5 +15,6 @@ module.exports = {
   env: {
     SPOTIFY_CLIENT_ID: process.env.SPOTIFY_CLIENT_ID,
   },
+  sourceMap: (options.mode !== 'production'),
   homepage: './',
-};
+});
