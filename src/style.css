@@ -14,7 +14,6 @@ a {
     text-decoration: none;
 }
 
-
 nav {
     padding: 0.5em;
     background: #F24738;
@@ -104,4 +103,9 @@ table.visual-table tbody tr:nth-child(2n+1) {
 
 .sort-and-filter .filter span {
     display: block;
+}
+
+.tools button {
+    padding: 0.5em;
+    margin-right: 1em;
 }

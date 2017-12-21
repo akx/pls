@@ -163,7 +163,7 @@ export default class PlaylistEntries extends React.Component {
             return this.setState({ filters: newFilters });
           }}
         />
-        <fieldset>
+        <fieldset className="tools">
           <legend>Tools</legend>
           <button
             disabled={entries.length === 0}
