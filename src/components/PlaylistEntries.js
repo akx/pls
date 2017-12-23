@@ -4,6 +4,7 @@ import sortBy from 'lodash/sortBy';
 import get from 'lodash/get';
 import reverse from 'lodash/reverse';
 import toPairs from 'lodash/toPairs';
+import map from 'lodash/map';
 import update from 'immutability-helper';
 
 import RequestStatus from './RequestStatus';
@@ -11,9 +12,14 @@ import SortAndFilterForm from './SortAndFilterForm';
 
 import TrackDetailsService from '../services/TrackDetailsService';
 import { createPlaylistWithTracks, getPlaylistEntries } from '../spotifyApi';
-import { DETAILS_FIELDS } from '../consts';
+import { DETAILS_FIELDS, QUANTIFIABLE_NUMERIC_FIELDS } from '../consts';
 import { formatDuration, formatTitle } from '../utils/format';
+import Qscale from '../utils/qscale';
 
+const HIGH = [110, 239, 112];
+const LOW = [253, 147, 38];
+const numQscale = new Qscale(20, LOW, HIGH, 0.9);
+numQscale.install();
 
 function augmentPlaylistEntryWithMerged(playlistEntry) {
   const merged = Object.assign(
@@ -28,6 +34,18 @@ function augmentPlaylistEntryWithMerged(playlistEntry) {
   return Object.assign({ _merged: merged }, playlistEntry);
 }
 
+function calculateNumberLimits(entries) {
+  const limits = {};
+  const mergeds = map(entries, '_merged');
+  QUANTIFIABLE_NUMERIC_FIELDS.forEach((field) => {
+    const values = map(mergeds, field);
+    const min = Math.min.apply(null, values);
+    const max = Math.max.apply(null, values);
+    limits[field] = [min, max];
+  });
+  return limits;
+}
+
 export default class PlaylistEntries extends React.Component {
   constructor(props) {
     super(props);
@@ -37,6 +55,7 @@ export default class PlaylistEntries extends React.Component {
       sort: 'original',
       reverse: false,
       filters: {},
+      colorize: false,
     };
   }
 
@@ -116,7 +135,7 @@ export default class PlaylistEntries extends React.Component {
         const [field, op] = key.split(':');
 
         let filterValue = value;
-        if(op === 'gte' || op === 'lte') {
+        if (op === 'gte' || op === 'lte') {
           filterValue = parseFloat(filterValue);
           if (Number.isNaN(filterValue)) return true;
         }
@@ -141,7 +160,7 @@ export default class PlaylistEntries extends React.Component {
   }
 
   render() {
-    const { playlistEntries, playlistEntriesRequest, trackDetailsRequest } = this.state;
+    const { playlistEntries, playlistEntriesRequest, trackDetailsRequest, colorize } = this.state;
     if (!playlistEntriesRequest) return null;
     if (!playlistEntriesRequest.result) {
       return (
@@ -164,6 +183,7 @@ export default class PlaylistEntries extends React.Component {
       );
     }
     const entries = this.sortAndFilterEntries(playlistEntries);
+    const numberLimits = (colorize ? calculateNumberLimits(entries) : {});
 
     return (
       <div>
@@ -193,6 +213,10 @@ export default class PlaylistEntries extends React.Component {
           >
             Export JSON Track Data
           </button>
+          <label>
+            <input type="checkbox" checked={colorize} onChange={(e) => this.setState({ colorize: e.target.checked })} />
+            Colorize Numbers
+          </label>
         </fieldset>
         <table className="visual-table">
           <thead>
@@ -215,7 +239,15 @@ export default class PlaylistEntries extends React.Component {
                   <td>{entry.name}</td>
                   <td>{(entry.album ? entry.album.name : null)}</td>
                   <td>{formatDuration(entry.duration_ms)}</td>
-                  {DETAILS_FIELDS.map(f => <td key={f}>{entry[f]}</td>)}
+                  {DETAILS_FIELDS.map(f => (
+                    <td
+                      key={f}
+                      title={f}
+                      className={colorize && numberLimits[f] ? numQscale.getClassName(entry[f], numberLimits[f][0], numberLimits[f][1]) : null}
+                    >
+                      {entry[f]}
+                    </td>
+                  ))}
                 </tr>
               );
             })}

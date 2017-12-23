@@ -54,6 +54,10 @@ table.visual-table tbody tr:nth-child(2n+1) {
     background: #f7efdf;
 }
 
+table.visual-table tbody tr:hover {
+    background: #f5d9a4;
+}
+
 .request-status {
     padding: 1em;
     background: #f7efdf;
