@@ -1,4 +1,4 @@
-/* eslint-disable no-alert,no-console */
+/* eslint-disable no-alert,no-console,no-underscore-dangle */
 import React from 'react';
 import sortBy from 'lodash/sortBy';
 import get from 'lodash/get';
@@ -14,6 +14,19 @@ import { createPlaylistWithTracks, getPlaylistEntries } from '../spotifyApi';
 import { DETAILS_FIELDS } from '../consts';
 import { formatDuration, formatTitle } from '../utils/format';
 
+
+function augmentPlaylistEntryWithMerged(playlistEntry) {
+  const merged = Object.assign(
+    {},
+    playlistEntry,
+    playlistEntry.track,
+    TrackDetailsService.getDetails(playlistEntry.track.id) || {},
+  );
+  delete merged.track;
+  merged.artistName = merged.artists.map(a => a.name).join(', ');
+  merged.albumName = get(merged, 'album.name');
+  return Object.assign({ _merged: merged }, playlistEntry);
+}
 
 export default class PlaylistEntries extends React.Component {
   constructor(props) {
@@ -76,9 +89,13 @@ export default class PlaylistEntries extends React.Component {
       });
   }
 
-  downloadEntriesJSON(tracks) {
+  downloadEntriesJSON(playlistEntries) {
     const { playlist } = this.props;
-    const jsonData = JSON.stringify(tracks, null, 2);
+    const jsonData = JSON.stringify(playlistEntries.map((ple) => {
+      const copy = Object.assign({}, ple);
+      delete copy._merged;
+      return copy;
+    }), null, 2);
     const blob = new Blob([jsonData], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const downloadLink = Object.assign(document.createElement('a'), {
@@ -99,7 +116,7 @@ export default class PlaylistEntries extends React.Component {
         const filterValue = parseFloat(value);
         if (Number.isNaN(filterValue)) return true;
         const [field, op] = key.split(':');
-        const objectValue = entry[field];
+        const objectValue = entry._merged[field];
         if (objectValue === undefined) return false;
         if (op === 'gte') return objectValue >= filterValue;
         if (op === 'lte') return objectValue <= filterValue;
@@ -107,16 +124,10 @@ export default class PlaylistEntries extends React.Component {
         return true;
       })
     );
-    let entries = (playlistEntries || []).map(ple => Object.assign(
-      {},
-      ple,
-      ple.track,
-      TrackDetailsService.getDetails(ple.track.id) || {},
-      { track: null },
-    )).filter(filterEntry);
+    let entries = (playlistEntries || []).map(augmentPlaylistEntryWithMerged).filter(filterEntry);
     if (this.state.sort !== 'original') {
       const sortKey = this.state.sort;
-      entries = sortBy(entries, entry => get(entry, sortKey));
+      entries = sortBy(entries, entry => get(entry._merged, sortKey));
     }
     if (this.state.reverse) {
       entries = reverse(entries);
@@ -190,16 +201,19 @@ export default class PlaylistEntries extends React.Component {
             </tr>
           </thead>
           <tbody>
-            {entries.map(entry => (
-              <tr key={entry.originalIndex}>
-                <td>{entry.originalIndex + 1}</td>
-                <td>{entry.artists.map(a => a.name).join(', ')}</td>
-                <td>{entry.name}</td>
-                <td>{(entry.album ? entry.album.name : null)}</td>
-                <td>{formatDuration(entry.duration_ms)}</td>
-                {DETAILS_FIELDS.map(f => <td key={f}>{entry[f]}</td>)}
-              </tr>
-            ))}
+            {entries.map((entry) => {
+              entry = entry._merged;
+              return (
+                <tr key={entry.originalIndex}>
+                  <td>{entry.originalIndex + 1}</td>
+                  <td>{entry.artists.map(a => a.name).join(', ')}</td>
+                  <td>{entry.name}</td>
+                  <td>{(entry.album ? entry.album.name : null)}</td>
+                  <td>{formatDuration(entry.duration_ms)}</td>
+                  {DETAILS_FIELDS.map(f => <td key={f}>{entry[f]}</td>)}
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
