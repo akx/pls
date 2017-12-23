@@ -113,13 +113,18 @@ export default class PlaylistEntries extends React.Component {
     const filterPairs = toPairs(this.state.filters).filter(([, value]) => value !== '');
     const filterEntry = entry => (
       filterPairs.every(([key, value]) => {
-        const filterValue = parseFloat(value);
-        if (Number.isNaN(filterValue)) return true;
         const [field, op] = key.split(':');
+
+        let filterValue = value;
+        if(op === 'gte' || op === 'lte') {
+          filterValue = parseFloat(filterValue);
+          if (Number.isNaN(filterValue)) return true;
+        }
         const objectValue = entry._merged[field];
         if (objectValue === undefined) return false;
         if (op === 'gte') return objectValue >= filterValue;
         if (op === 'lte') return objectValue <= filterValue;
+        if (op === 'contains') return objectValue.toString().includes(filterValue);
         console.warn(key, field, op, value);
         return true;
       })

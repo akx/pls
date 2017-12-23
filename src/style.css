@@ -85,16 +85,37 @@ table.visual-table tbody tr:nth-child(2n+1) {
     border-radius: 2em;
 }
 
-.sort-and-filter .filters table {
+table.numeric-filters {
     width: 100%;
+    border-collapse: collapse;
 }
 
-.sort-and-filter .filter {
+table.numeric-filters td,
+table.numeric-filters th {
+    margin: 0;
+    padding: 0;
+}
+
+table.numeric-filters td {
+    border: 1px solid #ddd;
+}
+
+table.numeric-filters th {
+    font-size: 9pt;
+}
+
+table.numeric-filters input {
+    border: none;
+}
+
+.string-filters {
+    display: flex;
+    margin: 0.5em 0;
+}
+
+.string-filters input {
     flex: 1;
-    margin: 0.25em;
-    padding: 0.25em;
-    background: #fff;
-    box-shadow: 0px 7px 5px -7px rgba(0, 0, 0, 0.5);
+    margin: 2px;
 }
 
 .sort-and-filter input[type=number] {
