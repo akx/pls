@@ -160,7 +160,12 @@ export default class PlaylistEntries extends React.Component {
   }
 
   render() {
-    const { playlistEntries, playlistEntriesRequest, trackDetailsRequest, colorize } = this.state;
+    const {
+      playlistEntries,
+      playlistEntriesRequest,
+      trackDetailsRequest,
+      colorize,
+    } = this.state;
     if (!playlistEntriesRequest) return null;
     if (!playlistEntriesRequest.result) {
       return (
@@ -214,7 +219,7 @@ export default class PlaylistEntries extends React.Component {
             Export JSON Track Data
           </button>
           <label>
-            <input type="checkbox" checked={colorize} onChange={(e) => this.setState({ colorize: e.target.checked })} />
+            <input type="checkbox" checked={colorize} onChange={e => this.setState({ colorize: e.target.checked })} />
             Colorize Numbers
           </label>
         </fieldset>
@@ -231,7 +236,7 @@ export default class PlaylistEntries extends React.Component {
           </thead>
           <tbody>
             {entries.map((entry) => {
-              entry = entry._merged;
+              entry = entry._merged; // eslint-disable-line no-param-reassign
               return (
                 <tr key={entry.originalIndex}>
                   <td>{entry.originalIndex + 1}</td>

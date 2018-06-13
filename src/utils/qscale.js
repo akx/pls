@@ -1,11 +1,11 @@
 import uniqueId from 'lodash/uniqueId';
 
 function lerp(a, b, alpha) {
-  return (b * alpha) + a * (1 - alpha);
+  return (b * alpha) + (a * (1 - alpha));
 }
 
 export default class Qscale {
-  constructor(nClasses, rgb1, rgb2, opacity=1) {
+  constructor(nClasses, rgb1, rgb2, opacity = 1) {
     this.id = uniqueId();
     this.classPrefix = `qsc${this.id}_`;
     this.nClasses = nClasses;
@@ -20,13 +20,12 @@ export default class Qscale {
     const [r1, g1, b1] = this.rgb1;
     const [r2, g2, b2] = this.rgb2;
     const n = this.nClasses;
-    for (let i = 0; i < n; i++) {
+    for (let i = 0; i < n; i += 1) {
       const alpha = i / (n - 1);
       const r = lerp(r1, r2, alpha);
       const g = lerp(g1, g2, alpha);
       const b = lerp(b1, b2, alpha);
-      rules.push(
-        `.${this.classPrefix}${i} {
+      rules.push(`.${this.classPrefix}${i} {
           background: rgba(${Math.round(r)}, ${Math.round(g)}, ${Math.round(b)}, ${this.opacity});
         }`);
     }

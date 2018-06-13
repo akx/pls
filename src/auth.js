@@ -23,7 +23,7 @@ export function redirectToAuth() {
       'playlist-read-private',
       'playlist-read-collaborative',
     ].join(' '),
-    //show_dialog: true,
+    // show_dialog: true,
     redirect_uri: location.href.replace(/[?#]+.*/g, ''),
   })}`);
 }
