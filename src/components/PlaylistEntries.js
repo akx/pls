@@ -92,12 +92,16 @@ export default class PlaylistEntries extends React.Component {
   }
 
   // eslint-disable-next-line class-methods-use-this
-  createNewPlaylist(tracks) {
+  createNewPlaylist(entries) {
+    const spotifyUris = entries.map(ent => ent._merged.uri).filter(uri => uri);
+    if (!spotifyUris.length) {
+      alert('No tracks to create a playlist from.');
+      return false;
+    }
     const title = prompt('What should the new playlist be called?');
     if (!title) {
       return false;
     }
-    const spotifyUris = tracks.map(track => track.uri).filter(uri => uri);
     return createPlaylistWithTracks(title, spotifyUris)
       .then(() => {
         alert('Playlist successfully created. :)');
