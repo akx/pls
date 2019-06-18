@@ -12,7 +12,7 @@ module.exports = (options, req) => ({
       options: {},
     },
   ],
-  entry: './src/index.js',
+  entry: './src/index.tsx',
   envs: {
     SPOTIFY_CLIENT_ID: process.env.SPOTIFY_CLIENT_ID,
   },

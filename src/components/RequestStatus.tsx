@@ -1,7 +1,20 @@
 import React from 'react';
 import Error from './Error';
+import Request from '../utils/request';
 
-export default ({ request, progressMessage, errorMessage, retry }) => {
+interface RequestStatusProps {
+  request: Request<any, any, any>;
+  progressMessage: string;
+  errorMessage?: string;
+  retry: () => void;
+}
+
+const RequestStatus: React.FunctionComponent<RequestStatusProps> = ({
+  request,
+  progressMessage,
+  errorMessage,
+  retry,
+}) => {
   if (!request) return null;
   if (request.error) {
     return <Error error={request.error} message={errorMessage || 'An error occurred'} retry={retry} />;
@@ -11,7 +24,10 @@ export default ({ request, progressMessage, errorMessage, retry }) => {
     return (
       <div className="request-status">
         <div className="request-status-message">
-          {(progressMessage || 'Loading').replace('{n}', progress && progress.total ? `${progress.total}` : '')}
+          {(progressMessage || 'Loading').replace(
+            '{n}',
+            progress !== undefined && progress.total ? `${progress.total}` : '',
+          )}
         </div>
         {progress && progress.loaded ? (
           <div className="request-status-progress-wrapper">
@@ -26,3 +42,4 @@ export default ({ request, progressMessage, errorMessage, retry }) => {
   }
   return null;
 };
+export default RequestStatus;

@@ -1,14 +1,15 @@
-/* eslint-disable no-param-reassign,no-console */
 import { requestAuthenticated } from '../spotifyApi';
 import Request from '../utils/request';
+import { AudioFeaturesResponse, AudioFeature } from '../types/spotify';
 
-class TrackDetailsService {
-  constructor() {
-    this.cache = new Map();
-    this.listeners = [];
-  }
+export interface AudioFeatureMap {
+  [id: string]: AudioFeature;
+}
 
-  ensureLoaded(trackIds) {
+class AudioFeaturesService {
+  private readonly cache: Map<string, AudioFeature | null> = new Map();
+
+  ensureLoaded(trackIds: readonly string[]): Request<AudioFeatureMap> {
     trackIds = trackIds.filter(id => id);
     return new Request((resolve, reject, request) => {
       const tick = () => {
@@ -19,7 +20,7 @@ class TrackDetailsService {
         });
         if (newTrackIds.length) {
           const trackIdsToQuery = newTrackIds.slice(0, 100); // Maximum for the API
-          requestAuthenticated({
+          requestAuthenticated<AudioFeaturesResponse>({
             url: 'https://api.spotify.com/v1/audio-features',
             params: {
               ids: trackIdsToQuery.join(','),
@@ -33,16 +34,19 @@ class TrackDetailsService {
             trackIdsToQuery.forEach(id => {
               if (!this.cache.has(id)) {
                 console.warn(`No analysis available for ${id}`);
-                this.cache.set(id, {});
+                this.cache.set(id, null);
               }
             });
             setTimeout(tick, 16);
           });
           return;
         }
-        const details = {};
+        const details: AudioFeatureMap = {};
         trackIds.forEach(trackId => {
-          details[trackId] = this.cache.get(trackId);
+          const feature = this.cache.get(trackId);
+          if (feature) {
+            details[trackId] = feature;
+          }
         });
         resolve(details);
       };
@@ -50,9 +54,9 @@ class TrackDetailsService {
     });
   }
 
-  getDetails(trackId) {
-    return this.cache.get(trackId);
+  getDetails(trackId: string): AudioFeature | undefined {
+    return this.cache.get(trackId) || undefined;
   }
 }
 
-export default new TrackDetailsService();
+export default new AudioFeaturesService();

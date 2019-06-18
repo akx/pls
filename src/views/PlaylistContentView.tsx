@@ -2,12 +2,20 @@ import React from 'react';
 import { getPlaylist } from '../spotifyApi';
 import PlaylistEntries from '../components/PlaylistEntries';
 import RequestStatus from '../components/RequestStatus';
+import Request from '../utils/request';
+import { RouteComponentProps } from 'react-router';
+import { Playlist } from '../types/spotify';
 
-export default class PlaylistContentView extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = { playlistRequest: null };
-  }
+interface PlaylistContentViewState {
+  playlistRequest?: Request<Playlist>;
+  playlist?: Playlist;
+}
+
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+interface PlaylistContentViewProps extends RouteComponentProps<{ user_id: string; playlist_id: string }> {}
+
+export default class PlaylistContentView extends React.Component<PlaylistContentViewProps, PlaylistContentViewState> {
+  public state: PlaylistContentViewState = {};
 
   componentDidMount() {
     this.loadData();
@@ -18,7 +26,7 @@ export default class PlaylistContentView extends React.Component {
     const userId = params.user_id;
     const playlistId = params.playlist_id;
     const playlistRequest = getPlaylist(userId, playlistId);
-    playlistRequest.then(playlist => {
+    playlistRequest.onComplete.push(playlist => {
       this.setState({ playlist });
     });
     this.setState({ playlistRequest });

@@ -1,12 +1,12 @@
-/* eslint-disable react/prefer-stateless-function */
 import React from 'react';
 import { NUMERIC_FILTER_FIELDS } from '../consts';
 import { formatTitle } from '../utils/format';
+import { FilterProps } from './types';
 
-export default class NumericFiltersTable extends React.Component {
-  render() {
-    const lteFields = [];
-    const gteFields = [];
+export default class NumericFiltersTable extends React.Component<FilterProps> {
+  public render() {
+    const lteFields: React.ReactChild[] = [];
+    const gteFields: React.ReactChild[] = [];
     NUMERIC_FILTER_FIELDS.forEach(f => {
       gteFields.push(
         <td key={f}>
