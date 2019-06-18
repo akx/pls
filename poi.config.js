@@ -8,13 +8,11 @@ if (!process.env.SPOTIFY_CLIENT_ID) {
 
 
 module.exports = (options, req) => ({
-  presets: [
-    ReactPreset(),
-  ],
   entry: './src/index.js',
-  env: {
+  envs: {
     SPOTIFY_CLIENT_ID: process.env.SPOTIFY_CLIENT_ID,
   },
-  sourceMap: (options.mode !== 'production'),
-  homepage: './',
+  output: {
+    publicUrl: './',
+  }
 });
