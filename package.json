@@ -12,6 +12,7 @@
     "axios": "^0.19.0",
     "dotenv": "^8.0.0",
     "immutability-helper": "^3.0.1",
+    "inter-ui": "^3.7.0",
     "lodash": "^4.17.11",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
