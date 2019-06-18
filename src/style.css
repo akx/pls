@@ -1,5 +1,5 @@
 /* #092140, #024959, #F2C777, #F24738, #BF2A2A */
-@import url('https://fonts.googleapis.com/css?family=Roboto+Condensed');
+@import url('~inter-ui/inter-hinted.css');
 
 * {
     box-sizing: border-box;
@@ -33,7 +33,7 @@ article {
 }
 
 body, input, button, select {
-    font: 12pt/1.1 'Roboto Condensed', sans-serif;
+    font: 11pt/1.1 'Inter', sans-serif;
 }
 
 table.visual-table {
