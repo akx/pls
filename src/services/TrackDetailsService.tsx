@@ -24,25 +24,24 @@ class TrackDetailsService {
             params: {
               ids: trackIdsToQuery.join(','),
             },
-          })
-            .then((resp) => {
-              resp.data.audio_features.forEach((fobj) => {
-                if (fobj) {
-                  this.cache.set(fobj.id, fobj);
-                }
-              });
-              trackIdsToQuery.forEach((id) => {
-                if (!this.cache.has(id)) {
-                  console.warn(`No analysis available for ${id}`);
-                  this.cache.set(id, {});
-                }
-              });
-              setTimeout(tick, 16);
+          }).then(resp => {
+            resp.data.audio_features.forEach(fobj => {
+              if (fobj) {
+                this.cache.set(fobj.id, fobj);
+              }
             });
+            trackIdsToQuery.forEach(id => {
+              if (!this.cache.has(id)) {
+                console.warn(`No analysis available for ${id}`);
+                this.cache.set(id, {});
+              }
+            });
+            setTimeout(tick, 16);
+          });
           return;
         }
         const details = {};
-        trackIds.forEach((trackId) => {
+        trackIds.forEach(trackId => {
           details[trackId] = this.cache.get(trackId);
         });
         resolve(details);

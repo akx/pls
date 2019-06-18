@@ -13,13 +13,12 @@ export default class PlaylistContentView extends React.Component {
     this.loadData();
   }
 
-
   loadData() {
     const { params } = this.props.match;
     const userId = params.user_id;
     const playlistId = params.playlist_id;
     const playlistRequest = getPlaylist(userId, playlistId);
-    playlistRequest.then((playlist) => {
+    playlistRequest.then(playlist => {
       this.setState({ playlist });
     });
     this.setState({ playlistRequest });
@@ -50,4 +49,3 @@ export default class PlaylistContentView extends React.Component {
     );
   }
 }
-

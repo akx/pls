@@ -1,8 +1,11 @@
 module.exports = {
   parser: '@typescript-eslint/parser',
   extends: [
+    'plugin:react/recommended',
     'plugin:@typescript-eslint/recommended',
-    'airbnb',
+    'plugin:jsx-a11y/recommended',
+    'prettier/@typescript-eslint',
+    'plugin:prettier/recommended',
   ],
   parserOptions: {
     ecmaVersion: 2018,
@@ -19,5 +22,10 @@ module.exports = {
     'react/prop-types': 'off',
     'jsx-a11y/label-has-for': 'off',
     'jsx-a11y/anchor-is-valid': 'off',
+  },
+  settings:  {
+    react:  {
+      version:  'detect',
+    },
   },
 };

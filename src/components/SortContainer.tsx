@@ -9,19 +9,23 @@ export default function SortContainer({ sort, setValue, reverse }) {
         <span>Sort: &nbsp;</span>
         <select
           value={sort}
-          onChange={(e) => {
+          onChange={e => {
             setValue('sort', e.target.value);
           }}
         >
           <option value="original">Original sort</option>
-          {SORT_FIELDS.map(f => <option key={f} value={f}>{formatTitle(f)}</option>)}
+          {SORT_FIELDS.map(f => (
+            <option key={f} value={f}>
+              {formatTitle(f)}
+            </option>
+          ))}
         </select>
       </label>
       <label>
         <input
           type="checkbox"
           checked={reverse}
-          onChange={(e) => {
+          onChange={e => {
             setValue('reverse', e.target.checked);
           }}
         />

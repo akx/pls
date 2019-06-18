@@ -5,13 +5,12 @@ if (!process.env.SPOTIFY_CLIENT_ID) {
   throw new Error('SPOTIFY_CLIENT_ID is required');
 }
 
-
 module.exports = (options, req) => ({
   plugins: [
     {
       resolve: '@poi/plugin-typescript',
-      options: {}
-    }
+      options: {},
+    },
   ],
   entry: './src/index.js',
   envs: {
@@ -19,5 +18,5 @@ module.exports = (options, req) => ({
   },
   output: {
     publicUrl: './',
-  }
+  },
 });

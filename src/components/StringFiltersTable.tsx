@@ -12,7 +12,7 @@ export default class StringFiltersTable extends React.Component {
             key={f}
             placeholder={`${formatTitle(f)} contains...`}
             value={this.props.filters[`${f}:contains`] || ''}
-            onChange={(e) => {
+            onChange={e => {
               this.props.setFilterValue(`${f}:contains`, e.target.value);
             }}
           />

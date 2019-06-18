@@ -15,26 +15,10 @@ export const DETAILS_FIELDS = [
   'popularity',
 ];
 
-export const SORT_FIELDS = [
-  'name',
-  'artistName',
-  'albumName',
-  'duration_ms',
-].concat(DETAILS_FIELDS);
+export const SORT_FIELDS = ['name', 'artistName', 'albumName', 'duration_ms'].concat(DETAILS_FIELDS);
 
-export const NUMERIC_FILTER_FIELDS = [
-  'duration_ms',
-].concat(DETAILS_FIELDS);
+export const NUMERIC_FILTER_FIELDS = ['duration_ms'].concat(DETAILS_FIELDS);
 
-export const QUANTIFIABLE_NUMERIC_FIELDS = without(
-  NUMERIC_FILTER_FIELDS,
-  'key',
-  'time_signature',
-  'mode',
-);
+export const QUANTIFIABLE_NUMERIC_FIELDS = without(NUMERIC_FILTER_FIELDS, 'key', 'time_signature', 'mode');
 
-export const STRING_FILTER_FIELDS = [
-  'name',
-  'artistName',
-  'albumName',
-];
+export const STRING_FILTER_FIELDS = ['name', 'artistName', 'albumName'];

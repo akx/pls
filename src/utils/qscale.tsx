@@ -1,7 +1,7 @@
 import uniqueId from 'lodash/uniqueId';
 
 function lerp(a, b, alpha) {
-  return (b * alpha) + (a * (1 - alpha));
+  return b * alpha + a * (1 - alpha);
 }
 
 export default class Qscale {
@@ -34,7 +34,7 @@ export default class Qscale {
 
   getClassName(value, min = 0, max = 1) {
     const scaledValue = (value - min) / (max - min);
-    const classNum = Math.max(0, Math.min((this.nClasses - 1), Math.round(this.nClasses * scaledValue)));
+    const classNum = Math.max(0, Math.min(this.nClasses - 1, Math.round(this.nClasses * scaledValue)));
     return `${this.classPrefix}${classNum}`;
   }
 
