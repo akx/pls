@@ -21,6 +21,16 @@
     "react-router-dom": "^5.0.1"
   },
   "devDependencies": {
+    "@poi/plugin-typescript": "^12.2.1",
+    "@types/dotenv": "^6.1.1",
+    "@types/lodash": "^4.14.134",
+    "@types/react": "^16.8.20",
+    "@types/react-dom": "^16.8.4",
+    "@types/react-dom-factories": "^1.0.2",
+    "@types/react-router": "^5.0.2",
+    "@types/react-router-dom": "^4.3.4",
+    "@typescript-eslint/eslint-plugin": "^1.10.2",
+    "@typescript-eslint/parser": "^1.10.2",
     "babel-eslint": "^10.0.2",
     "eslint": "^5.16.0",
     "eslint-config-airbnb": "^17.1.0",
@@ -31,6 +41,6 @@
     "ghpg": "^1.0.1",
     "nodemon": "^1.19.1",
     "poi": "^12.6.10",
-    "poi-preset-react": "^9.2.1"
+    "typescript": "^3.5.2"
   }
 }
