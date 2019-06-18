@@ -1,6 +1,12 @@
 import React from 'react';
 
-export default ({ error, message, retry }) => (
+interface ErrorProps {
+  error: Error;
+  message: string;
+  retry: () => void;
+}
+
+const Error: React.FunctionComponent<ErrorProps> = ({ error, message, retry }) => (
   <div>
     {message}
     {retry ? <button onClick={() => retry()}>Try again</button> : null}
@@ -12,3 +18,4 @@ export default ({ error, message, retry }) => (
     </details>
   </div>
 );
+export default Error;

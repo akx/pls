@@ -1,13 +1,16 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { getPlaylists } from '../spotifyApi';
+import { getPlaylists, PlaylistsRequest } from '../spotifyApi';
 import RequestStatus from '../components/RequestStatus';
+import { Playlist } from '../types/spotify';
 
-export default class PlaylistListView extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = { playlistsRequest: null };
-  }
+interface PlaylistListViewState {
+  playlistsRequest?: PlaylistsRequest;
+  playlists?: Playlist[];
+}
+
+export default class PlaylistListView extends React.Component<{}, PlaylistListViewState> {
+  public state: PlaylistListViewState = {};
 
   componentDidMount() {
     this.loadData();
@@ -15,7 +18,7 @@ export default class PlaylistListView extends React.Component {
 
   loadData() {
     const playlistsRequest = getPlaylists();
-    playlistsRequest.then(playlists => {
+    playlistsRequest.onComplete.push(playlists => {
       this.setState({ playlists });
     });
     playlistsRequest.onProgress.push(() => {
@@ -52,7 +55,7 @@ export default class PlaylistListView extends React.Component {
             <tr key={pl.id}>
               <td>
                 <Link to={`/playlist/${pl.owner.id}/${pl.id}`}>
-                  <b>{pl.name}</b> by
+                  <b>{pl.name}</b>{' by '}
                   {pl.owner.display_name || pl.owner.id}
                 </Link>
               </td>

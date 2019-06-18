@@ -1,4 +1,3 @@
-/* eslint-disable no-restricted-globals */
 import qs from 'querystring';
 
 export function getAuth() {
@@ -31,7 +30,10 @@ export function redirectToAuth() {
 export function checkAndSaveAuth() {
   const hqs = qs.parse(location.hash.replace(/^#/, ''));
   if (hqs.access_token && hqs.token_type === 'Bearer') {
-    const auth = Object.assign({ expiresAt: +new Date() + hqs.expires_in * 1000 }, hqs);
+    const auth = {
+      expiresAt: +new Date() + parseInt(`${hqs.expires_in}`, 10) * 1000,
+      ...hqs,
+    };
     sessionStorage.plsAuth = JSON.stringify(auth);
     location.hash = '';
     return auth;

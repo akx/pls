@@ -1,10 +1,12 @@
-/* eslint-disable react/prefer-stateless-function,react/no-multi-comp */
 import React from 'react';
 import NumericFiltersTable from './NumericFiltersTable';
-import SortContainer from './SortContainer';
+import SortContainer, { SortContainerProps } from './SortContainer';
 import StringFiltersTable from './StringFiltersTable';
+import { FilterProps } from './types';
 
-export default class SortAndFilterForm extends React.Component {
+interface SortAndFilterFormProps extends FilterProps, SortContainerProps {}
+
+export default class SortAndFilterForm extends React.Component<SortAndFilterFormProps> {
   render() {
     return (
       <fieldset className="sort-and-filter">
