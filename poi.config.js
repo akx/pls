@@ -1,5 +1,4 @@
 /* eslint-disable import/no-extraneous-dependencies */
-const ReactPreset = require('poi-preset-react');
 require('dotenv').config();
 
 if (!process.env.SPOTIFY_CLIENT_ID) {
@@ -8,6 +7,12 @@ if (!process.env.SPOTIFY_CLIENT_ID) {
 
 
 module.exports = (options, req) => ({
+  plugins: [
+    {
+      resolve: '@poi/plugin-typescript',
+      options: {}
+    }
+  ],
   entry: './src/index.js',
   envs: {
     SPOTIFY_CLIENT_ID: process.env.SPOTIFY_CLIENT_ID,
