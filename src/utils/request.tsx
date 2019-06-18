@@ -18,12 +18,12 @@ export default class Request {
       promise = new Promise((resolve, reject) => promiseOrExecutor(resolve, reject, this));
     }
     return promise
-      .then((result) => {
+      .then(result => {
         this.busy = false;
         this.result = result;
         return result;
       })
-      .catch((err) => {
+      .catch(err => {
         this.busy = false;
         this.error = err;
         return Promise.reject(err);

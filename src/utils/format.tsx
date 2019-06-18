@@ -1,6 +1,6 @@
 import upperFirst from 'lodash/upperFirst';
 
-export const formatDuration = (ms) => {
+export const formatDuration = ms => {
   const totalSecs = Math.round(ms / 1000);
   const mins = Math.floor(totalSecs / 60);
   const secs = totalSecs % 60;

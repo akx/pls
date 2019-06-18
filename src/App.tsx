@@ -27,7 +27,7 @@ export default class App extends React.Component {
             <Link to="/">List Playlists</Link>
             <a
               href="#"
-              onClick={(e) => {
+              onClick={e => {
                 unauth();
                 this.forceUpdate();
                 e.preventDefault();

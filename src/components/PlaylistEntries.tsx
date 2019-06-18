@@ -37,7 +37,7 @@ function augmentPlaylistEntryWithMerged(playlistEntry) {
 function calculateNumberLimits(entries) {
   const limits = {};
   const mergeds = map(entries, '_merged');
-  QUANTIFIABLE_NUMERIC_FIELDS.forEach((field) => {
+  QUANTIFIABLE_NUMERIC_FIELDS.forEach(field => {
     const values = map(mergeds, field);
     const min = Math.min.apply(null, values);
     const max = Math.max.apply(null, values);
@@ -70,7 +70,7 @@ export default class PlaylistEntries extends React.Component {
     playlistEntriesRequest.onProgress.push(() => {
       this.forceUpdate();
     });
-    playlistEntriesRequest.then((playlistEntries) => {
+    playlistEntriesRequest.then(playlistEntries => {
       this.setState({ playlistEntries });
       this.loadTrackDetails();
     });
@@ -106,7 +106,7 @@ export default class PlaylistEntries extends React.Component {
       .then(() => {
         alert('Playlist successfully created. :)');
       })
-      .catch((err) => {
+      .catch(err => {
         console.error(err);
         alert(`Error creating playlist: ${err}`);
       });
@@ -114,11 +114,15 @@ export default class PlaylistEntries extends React.Component {
 
   downloadEntriesJSON(playlistEntries) {
     const { playlist } = this.props;
-    const jsonData = JSON.stringify(playlistEntries.map((ple) => {
-      const copy = Object.assign({}, ple);
-      delete copy._merged;
-      return copy;
-    }), null, 2);
+    const jsonData = JSON.stringify(
+      playlistEntries.map(ple => {
+        const copy = Object.assign({}, ple);
+        delete copy._merged;
+        return copy;
+      }),
+      null,
+      2,
+    );
     const blob = new Blob([jsonData], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const downloadLink = Object.assign(document.createElement('a'), {
@@ -134,7 +138,7 @@ export default class PlaylistEntries extends React.Component {
 
   sortAndFilterEntries(playlistEntries) {
     const filterPairs = toPairs(this.state.filters).filter(([, value]) => value !== '');
-    const filterEntry = entry => (
+    const filterEntry = entry =>
       filterPairs.every(([key, value]) => {
         const [field, op] = key.split(':');
 
@@ -150,8 +154,7 @@ export default class PlaylistEntries extends React.Component {
         if (op === 'contains') return objectValue.toString().includes(filterValue);
         console.warn(key, field, op, value);
         return true;
-      })
-    );
+      });
     let entries = (playlistEntries || []).map(augmentPlaylistEntryWithMerged).filter(filterEntry);
     if (this.state.sort !== 'original') {
       const sortKey = this.state.sort;
@@ -164,12 +167,7 @@ export default class PlaylistEntries extends React.Component {
   }
 
   render() {
-    const {
-      playlistEntries,
-      playlistEntriesRequest,
-      trackDetailsRequest,
-      colorize,
-    } = this.state;
+    const { playlistEntries, playlistEntriesRequest, trackDetailsRequest, colorize } = this.state;
     if (!playlistEntriesRequest) return null;
     if (!playlistEntriesRequest.result) {
       return (
@@ -192,7 +190,7 @@ export default class PlaylistEntries extends React.Component {
       );
     }
     const entries = this.sortAndFilterEntries(playlistEntries);
-    const numberLimits = (colorize ? calculateNumberLimits(entries) : {});
+    const numberLimits = colorize ? calculateNumberLimits(entries) : {};
 
     return (
       <div>
@@ -203,23 +201,17 @@ export default class PlaylistEntries extends React.Component {
           filters={this.state.filters}
           setValue={(key, value) => this.setState({ [key]: value })}
           setFilterValue={(key, value) => {
-            const updateCommand = (value === '' ? { $unset: [key] } : { [key]: { $set: value } });
+            const updateCommand = value === '' ? { $unset: [key] } : { [key]: { $set: value } };
             const newFilters = update(this.state.filters, updateCommand);
             return this.setState({ filters: newFilters });
           }}
         />
         <fieldset className="tools">
           <legend>Tools</legend>
-          <button
-            disabled={entries.length === 0}
-            onClick={() => this.createNewPlaylist(entries)}
-          >
+          <button disabled={entries.length === 0} onClick={() => this.createNewPlaylist(entries)}>
             Create New Playlist of {entries.length} Tracks
           </button>
-          <button
-            disabled={entries.length === 0}
-            onClick={() => this.downloadEntriesJSON(entries)}
-          >
+          <button disabled={entries.length === 0} onClick={() => this.downloadEntriesJSON(entries)}>
             Export JSON Track Data
           </button>
           <label>
@@ -235,24 +227,30 @@ export default class PlaylistEntries extends React.Component {
               <th>Track</th>
               <th>Album</th>
               <th>Duration</th>
-              {DETAILS_FIELDS.map(f => <th key={f}>{formatTitle(f)}</th>)}
+              {DETAILS_FIELDS.map(f => (
+                <th key={f}>{formatTitle(f)}</th>
+              ))}
             </tr>
           </thead>
           <tbody>
-            {entries.map((entry) => {
+            {entries.map(entry => {
               entry = entry._merged; // eslint-disable-line no-param-reassign
               return (
                 <tr key={entry.originalIndex}>
                   <td>{entry.originalIndex + 1}</td>
                   <td>{entry.artists.map(a => a.name).join(', ')}</td>
                   <td>{entry.name}</td>
-                  <td>{(entry.album ? entry.album.name : null)}</td>
+                  <td>{entry.album ? entry.album.name : null}</td>
                   <td>{formatDuration(entry.duration_ms)}</td>
                   {DETAILS_FIELDS.map(f => (
                     <td
                       key={f}
                       title={f}
-                      className={colorize && numberLimits[f] ? numQscale.getClassName(entry[f], numberLimits[f][0], numberLimits[f][1]) : null}
+                      className={
+                        colorize && numberLimits[f]
+                          ? numQscale.getClassName(entry[f], numberLimits[f][0], numberLimits[f][1])
+                          : null
+                      }
                     >
                       {entry[f]}
                     </td>
