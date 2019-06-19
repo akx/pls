@@ -13,14 +13,12 @@ import TrackDetailsService, { AudioFeatureMap } from '../services/AudioFeaturesS
 import { createPlaylistWithTracks, getPlaylistEntries, PlaylistEntriesRequest } from '../spotifyApi';
 import { DETAILS_FIELDS, QUANTIFIABLE_NUMERIC_FIELDS } from '../consts';
 import { formatDuration, formatTitle } from '../utils/format';
-import Qscale from '../utils/qscale';
 import { Playlist, PlaylistEntry } from '../types/spotify';
 import { AugmentedPlaylistEntry } from '../types/pls';
 import Request from '../utils/request';
 import { downloadBlob } from '../utils/blobs';
-
-const numQscale = new Qscale(20, [253, 147, 38], [110, 239, 112], 0.9);
-numQscale.install();
+import { NumberLimits } from './types';
+import PlaylistEntriesTableRow from './PlaylistEntriesTableRow';
 
 function makeAugmentedPlaylistEntry(playlistEntry: PlaylistEntry): AugmentedPlaylistEntry {
   return {
@@ -33,7 +31,7 @@ function makeAugmentedPlaylistEntry(playlistEntry: PlaylistEntry): AugmentedPlay
 }
 
 function calculateNumberLimits(entries: AugmentedPlaylistEntry[]) {
-  const limits: { [key: string]: [number, number] } = {};
+  const limits: NumberLimits = {};
   QUANTIFIABLE_NUMERIC_FIELDS.forEach(field => {
     const values = map(entries, field);
     const min = Math.min.apply(null, values);
@@ -228,33 +226,14 @@ export default class PlaylistEntries extends React.Component<PlaylistEntriesProp
             </tr>
           </thead>
           <tbody>
-            {entries.map(entry => {
-
-              return (
-                <tr key={entry.originalIndex}>
-                  <td>{(entry.originalIndex || 0) + 1}</td>
-                  <td>{entry.artists.map(a => a.name).join(', ')}</td>
-                  <td>{entry.name}</td>
-                  <td>{entry.album ? entry.album.name : null}</td>
-                  <td>{formatDuration(entry.duration_ms)}</td>
-                  {DETAILS_FIELDS.map(f => {
-                    const value = entry[f as keyof AugmentedPlaylistEntry];
-                    const className = colorize && numberLimits[f]
-                      ? numQscale.getClassName(value as number, numberLimits[f][0], numberLimits[f][1])
-                      : undefined;
-                    return (
-                      <td
-                        key={f}
-                        title={f}
-                        className={className}
-                      >
-                        {value}
-                      </td>
-                    );
-                  })}
-                </tr>
-              );
-            })}
+            {entries.map(entry => (
+              <PlaylistEntriesTableRow
+                entry={entry}
+                key={entry.originalIndex}
+                colorize={colorize}
+                numberLimits={numberLimits}
+              />
+            ))}
           </tbody>
         </table>
       </div>
