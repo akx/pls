@@ -194,7 +194,7 @@ export default class PlaylistEntries extends React.Component<PlaylistEntriesProp
           reverse={this.state.reverse}
           filters={this.state.filters}
           /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-          setValue={(key, value) => this.setState({ [key]: value } as any)}
+          setSort={(key, reverse) => this.setState({ sort: key, reverse })}
           setFilterValue={(key, value) => {
             const updateCommand = value === '' ? { $unset: [key] } : { [key]: { $set: value } };
             const newFilters = update(this.state.filters, updateCommand);

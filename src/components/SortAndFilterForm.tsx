@@ -11,7 +11,7 @@ export default class SortAndFilterForm extends React.Component<SortAndFilterForm
     return (
       <fieldset className="sort-and-filter">
         <legend>Sort & Filter</legend>
-        <SortContainer sort={this.props.sort} setValue={this.props.setValue} reverse={this.props.reverse} />
+        <SortContainer sort={this.props.sort} setSort={this.props.setSort} reverse={this.props.reverse} />
         <div className="filters">
           <StringFiltersTable setFilterValue={this.props.setFilterValue} filters={this.props.filters} />
           <NumericFiltersTable setFilterValue={this.props.setFilterValue} filters={this.props.filters} />
