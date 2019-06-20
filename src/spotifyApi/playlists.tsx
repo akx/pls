@@ -1,64 +1,8 @@
-import axios, { AxiosRequestConfig } from 'axios/index';
+import { loadPagedResource, PagedResourceRequest } from './paged';
+import { Playlist, PlaylistEntry } from '../types/spotify';
+import Request from '../utils/request';
+import { requestAuthenticated } from './auth';
 import chunk from 'lodash/chunk';
-
-import { getAuth } from './auth';
-import Request, { ProgressWithItems } from './utils/request';
-import { PagedResponse, Playlist, PlaylistEntry } from './types/spotify';
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function requestAuthenticated<TResponse = any>(options: Partial<AxiosRequestConfig>) {
-  const auth = getAuth();
-  if (!(auth && auth.access_token)) {
-    return Promise.reject(new Error('Not authenticated'));
-  }
-  const headers = {
-    ...(options.headers || {}),
-    Authorization: `Bearer ${auth.access_token}`,
-  };
-
-  return axios.request<TResponse>({ method: 'GET', ...options, headers });
-}
-
-export type PagedResourceRequest<TResource> = Request<TResource[], Error, ProgressWithItems<TResource>>;
-
-function loadPagedResource<TResource>(
-  url: string,
-  params: { [key: string]: string },
-  limit: number,
-  requestLimit = 50,
-): PagedResourceRequest<TResource> {
-  let offset = 0;
-  const items: TResource[] = [];
-  return new Request<TResource[], Error, ProgressWithItems<TResource>>((resolve, reject, request) => {
-    const tick = () =>
-      requestAuthenticated<PagedResponse<TResource>>({
-        url,
-        params: { ...params, limit: requestLimit, offset },
-      })
-        .then(({ data }) => {
-          data.items.forEach(item => {
-            items.push(item);
-          });
-          request.reportProgress({
-            total: data.total,
-            loaded: items.length,
-            items,
-          });
-          if (request.cancelRequested) {
-            reject(new Error('cancel'));
-            return;
-          }
-          if (data.next && items.length < limit) {
-            offset += data.limit;
-            setTimeout(tick, 16);
-          } else {
-            resolve(items);
-          }
-        })
-        .catch(reject);
-    tick();
-  });
-}
 
 export type PlaylistsRequest = PagedResourceRequest<Playlist>;
 export type PlaylistEntriesRequest = PagedResourceRequest<PlaylistEntry>;

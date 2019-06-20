@@ -1,10 +1,10 @@
 import React from 'react';
-import { getPlaylist } from '../spotifyApi';
 import PlaylistEntries from '../components/PlaylistEntries';
 import RequestStatus from '../components/RequestStatus';
 import Request from '../utils/request';
 import { RouteComponentProps } from 'react-router';
 import { Playlist } from '../types/spotify';
+import { getPlaylist } from '../spotifyApi/playlists';
 
 interface PlaylistContentViewState {
   playlistRequest?: Request<Playlist>;
