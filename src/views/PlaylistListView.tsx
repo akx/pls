@@ -1,8 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { getPlaylists, PlaylistsRequest } from '../spotifyApi';
 import RequestStatus from '../components/RequestStatus';
 import { Playlist } from '../types/spotify';
+import { getPlaylists, PlaylistsRequest } from '../spotifyApi/playlists';
 
 interface PlaylistListViewState {
   playlistsRequest?: PlaylistsRequest;

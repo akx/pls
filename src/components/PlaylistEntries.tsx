@@ -10,7 +10,6 @@ import RequestStatus from './RequestStatus';
 import SortAndFilterForm from './SortAndFilterForm';
 
 import TrackDetailsService, { AudioFeatureMap } from '../services/AudioFeaturesService';
-import { createPlaylistWithTracks, getPlaylistEntries, PlaylistEntriesRequest } from '../spotifyApi';
 import { DETAILS_FIELDS, QUANTIFIABLE_NUMERIC_FIELDS } from '../consts';
 import { formatDuration, formatTitle } from '../utils/format';
 import { Playlist, PlaylistEntry } from '../types/spotify';
@@ -19,6 +18,7 @@ import Request from '../utils/request';
 import { downloadBlob } from '../utils/blobs';
 import { NumberLimits } from './types';
 import PlaylistEntriesTableRow from './PlaylistEntriesTableRow';
+import { createPlaylistWithTracks, getPlaylistEntries, PlaylistEntriesRequest } from '../spotifyApi/playlists';
 
 function makeAugmentedPlaylistEntry(playlistEntry: PlaylistEntry): AugmentedPlaylistEntry {
   return {

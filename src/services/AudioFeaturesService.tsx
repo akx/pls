@@ -1,6 +1,6 @@
-import { requestAuthenticated } from '../spotifyApi';
 import Request from '../utils/request';
 import { AudioFeaturesResponse, AudioFeature } from '../types/spotify';
+import { requestAuthenticated } from '../spotifyApi/auth';
 
 export interface AudioFeatureMap {
   [id: string]: AudioFeature;
