@@ -1,7 +1,12 @@
 /* eslint-disable @typescript-eslint/no-empty-interface */
 
 export interface User {
+  external_urls: ExternalUrls;
+  href: string;
   id: string;
+  type: string;
+  uri: string;
+  name?: string;
 }
 
 export interface SpotifyResource {
@@ -61,20 +66,20 @@ export interface PlaylistTracksResponse extends PagedResponse<PlaylistEntry> {}
 export interface PlaylistEntry {
   originalIndex?: number; // _not_ in response data!
   added_at: string;
-  added_by: AddedBy;
+  added_by: User;
   is_local: boolean;
   primary_color: string | null;
   track: Track;
   video_thumbnail: VideoThumbnail;
 }
 
-export interface AddedBy {
+export interface Artist {
   external_urls: ExternalUrls;
   href: string;
   id: string;
+  name: string;
   type: string;
   uri: string;
-  name?: string;
 }
 
 export interface ExternalUrls {
@@ -83,7 +88,7 @@ export interface ExternalUrls {
 
 export interface Track {
   album: Album;
-  artists: AddedBy[];
+  artists: Artist[];
   available_markets: string[];
   disc_number: number;
   duration_ms: number;
@@ -106,18 +111,36 @@ export interface Track {
 
 export interface Album {
   album_type: string;
-  artists: AddedBy[];
+  artists: Artist[];
   available_markets: string[];
   external_urls: ExternalUrls;
   href: string;
   id: string;
   images: Image[];
   name: string;
+  popularity?: number;
   release_date: string;
   release_date_precision: string;
   total_tracks: number;
   type: string;
   uri: string;
+}
+
+export interface AlbumDetail extends Album {
+  copyrights: Copyright[];
+  external_ids: AlbumExternalIDs;
+  genres: string[];
+  label: string;
+  tracks: PagedResponse<Track>;
+}
+
+export interface AlbumExternalIDs {
+  upc: string;
+}
+
+export interface Copyright {
+  text: string;
+  type: string;
 }
 
 export interface TrackExternalIds {
@@ -151,4 +174,22 @@ export interface AudioFeature {
   analysis_url: string;
   duration_ms: number;
   time_signature: number;
+}
+
+export interface SearchResult {
+  albums?: PagedResponse<Album>;
+  artists?: PagedResponse<SearchArtist>;
+  tracks?: PagedResponse<Track>;
+}
+
+export interface SearchArtist extends Artist {
+  followers: Followers;
+  genres: string[];
+  images: Image[];
+  popularity: number;
+}
+
+export interface Followers {
+  href: null;
+  total: number;
 }
