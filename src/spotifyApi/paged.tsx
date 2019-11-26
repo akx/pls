@@ -13,32 +13,33 @@ export function loadPagedResource<TResource>(
   let offset = 0;
   const items: TResource[] = [];
   return new Request<TResource[], Error, ProgressWithItems<TResource>>((resolve, reject, request) => {
-    const tick = () =>
-      requestAuthenticated<PagedResponse<TResource>>({
-        url,
-        params: { ...params, limit: requestLimit, offset },
-      })
-        .then(({ data }) => {
-          data.items.forEach(item => {
-            items.push(item);
-          });
-          request.reportProgress({
-            total: data.total,
-            loaded: items.length,
-            items,
-          });
-          if (request.cancelRequested) {
-            reject(new Error('cancel'));
-            return;
-          }
-          if (data.next && items.length < limit) {
-            offset += data.limit;
-            setTimeout(tick, 16);
-          } else {
-            resolve(items);
-          }
-        })
-        .catch(reject);
-    tick();
+    async function loadPage() {
+      try {
+        const { data } = await requestAuthenticated<PagedResponse<TResource>>({
+          url,
+          params: { ...params, limit: requestLimit, offset },
+        });
+        data.items.forEach(item => items.push(item));
+        request.reportProgress({
+          total: data.total,
+          loaded: items.length,
+          items,
+        });
+        if (request.cancelRequested) {
+          reject(new Error('cancel'));
+          return;
+        }
+        if (data.next && items.length < limit) {
+          offset += data.limit;
+          setTimeout(loadPage, 16);
+        } else {
+          resolve(items);
+        }
+      } catch (e) {
+        return reject(e);
+      }
+    }
+
+    loadPage();
   });
 }
