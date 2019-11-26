@@ -34,8 +34,9 @@ module.exports = {
     'max-len': 'off',
     'react/jsx-filename-extension': 'off',
     'react/prop-types': 'off',
-    'jsx-a11y/label-has-for': 'off',
     'jsx-a11y/anchor-is-valid': 'off',
+    'jsx-a11y/label-has-for': 'off',
+    'jsx-a11y/no-onchange': 'off',
   },
   settings: {
     react: {
