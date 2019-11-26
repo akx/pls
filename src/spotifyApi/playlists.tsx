@@ -1,5 +1,5 @@
 import { loadPagedResource, PagedResourceRequest } from './paged';
-import { Playlist, PlaylistEntry } from '../types/spotify';
+import { Playlist, PlaylistEntry, User } from '../types/spotify';
 import Request from '../utils/request';
 import { requestAuthenticated } from './auth';
 import chunk from 'lodash/chunk';
@@ -12,17 +12,13 @@ export function getPlaylists(limit = 0xffff): PlaylistsRequest {
 }
 
 export function getPlaylist(userId: string, playlistId: string): Request<Playlist> {
-  const plPromise = requestAuthenticated({
+  const plPromise = requestAuthenticated<Playlist>({
     url: `https://api.spotify.com/v1/users/${userId}/playlists/${playlistId}`,
   }).then(({ data }) => data);
   return new Request<Playlist>(plPromise);
 }
 
-export function getPlaylistEntries(
-  userId: string,
-  playlistId: string,
-  limit = 0xffff,
-): PlaylistEntriesRequest {
+export function getPlaylistEntries(userId: string, playlistId: string, limit = 0xffff): PlaylistEntriesRequest {
   const req = loadPagedResource<PlaylistEntry>(
     `https://api.spotify.com/v1/users/${userId}/playlists/${playlistId}/tracks`,
     {},
@@ -39,10 +35,10 @@ export function getPlaylistEntries(
 }
 
 export async function createPlaylistWithTracks(title: string, spotifyUris: readonly string[]) {
-  let userResp = await requestAuthenticated({ method: 'GET', url: 'https://api.spotify.com/v1/me' });
+  const userResp = await requestAuthenticated<User>({ method: 'GET', url: 'https://api.spotify.com/v1/me' });
   const userData = userResp.data;
   const userName = userData.id;
-  let resp = await requestAuthenticated({
+  const { data } = await requestAuthenticated<Playlist>({
     method: 'POST',
     url: `https://api.spotify.com/v1/users/${userName}/playlists`,
     data: {
@@ -51,7 +47,7 @@ export async function createPlaylistWithTracks(title: string, spotifyUris: reado
       public: false,
     },
   });
-  const newPlaylistId = resp.data.id;
+  const newPlaylistId = data.id;
   const spotifyUriChunks = chunk(spotifyUris, 100);
   return new Promise(resolve => {
     const tick = () => {

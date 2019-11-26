@@ -12,11 +12,11 @@ interface PlaylistListViewState {
 export default class PlaylistListView extends React.Component<{}, PlaylistListViewState> {
   public state: PlaylistListViewState = {};
 
-  componentDidMount() {
+  public componentDidMount() {
     this.loadData();
   }
 
-  loadData() {
+  private loadData() {
     const playlistsRequest = getPlaylists();
     playlistsRequest.onComplete.push(playlists => {
       this.setState({ playlists });
@@ -27,7 +27,7 @@ export default class PlaylistListView extends React.Component<{}, PlaylistListVi
     this.setState({ playlistsRequest });
   }
 
-  render() {
+  public render() {
     const { playlistsRequest } = this.state;
     if (!playlistsRequest) return null;
     if (!playlistsRequest.result) {
@@ -55,7 +55,8 @@ export default class PlaylistListView extends React.Component<{}, PlaylistListVi
             <tr key={pl.id}>
               <td>
                 <Link to={`/playlist/${pl.owner.id}/${pl.id}`}>
-                  <b>{pl.name}</b>{' by '}
+                  <b>{pl.name}</b>
+                  {' by '}
                   {pl.owner.display_name || pl.owner.id}
                 </Link>
               </td>

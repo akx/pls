@@ -6,11 +6,11 @@ import PlaylistListView from './views/PlaylistListView';
 import PlaylistContentView from './views/PlaylistContentView';
 
 export default class App extends React.Component {
-  componentWillMount() {
+  public UNSAFE_componentWillMount() {
     checkAndSaveAuth();
   }
 
-  render() {
+  public render() {
     const auth = getAuth();
     if (!auth) {
       return (

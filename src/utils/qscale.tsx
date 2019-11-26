@@ -15,7 +15,7 @@ export default class Qscale {
   private opacity: number;
   private styleTag: HTMLStyleElement | undefined;
 
-  constructor(nClasses: number, rgb1: RGB, rgb2: RGB, opacity: number = 1) {
+  constructor(nClasses: number, rgb1: RGB, rgb2: RGB, opacity = 1) {
     this.id = uniqueId();
     this.classPrefix = `qsc${this.id}_`;
     this.nClasses = nClasses;

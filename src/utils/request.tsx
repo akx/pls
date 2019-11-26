@@ -19,11 +19,11 @@ type PromiseOrExecutor<TResult, TError, TProgress extends Progress> =
 
 export default class Request<TResult, TError = Error, TProgress extends Progress = Progress> {
   public progress: TProgress | undefined;
-  public cancelRequested: boolean = false;
+  public cancelRequested = false;
   public onProgress: ((progress: TProgress) => void)[] = [];
   public onComplete: ((result: TResult) => void)[] = [];
   public onError: ((error: TError) => void)[] = [];
-  public busy: boolean = true;
+  public busy = true;
   public result: TResult | undefined;
   public error: TError | undefined;
   private _promise: Promise<TResult>;

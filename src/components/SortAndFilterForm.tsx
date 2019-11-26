@@ -6,17 +6,14 @@ import { FilterProps } from './types';
 
 interface SortAndFilterFormProps extends FilterProps, SortContainerProps {}
 
-export default class SortAndFilterForm extends React.Component<SortAndFilterFormProps> {
-  render() {
-    return (
-      <fieldset className="sort-and-filter">
-        <legend>Sort & Filter</legend>
-        <SortContainer sort={this.props.sort} setSort={this.props.setSort} reverse={this.props.reverse} />
-        <div className="filters">
-          <StringFiltersTable setFilterValue={this.props.setFilterValue} filters={this.props.filters} />
-          <NumericFiltersTable setFilterValue={this.props.setFilterValue} filters={this.props.filters} />
-        </div>
-      </fieldset>
-    );
-  }
-}
+const SortAndFilterForm: React.FC<SortAndFilterFormProps> = ({ filters, reverse, setFilterValue, setSort, sort }) => (
+  <fieldset className="sort-and-filter">
+    <legend>Sort & Filter</legend>
+    <SortContainer sort={sort} setSort={setSort} reverse={reverse} />
+    <div className="filters">
+      <StringFiltersTable setFilterValue={setFilterValue} filters={filters} />
+      <NumericFiltersTable setFilterValue={setFilterValue} filters={filters} />
+    </div>
+  </fieldset>
+);
+export default SortAndFilterForm;

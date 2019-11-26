@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "poi --serve",
     "dist": "rm -fr dist && poi --production && ghpg -d dist",
-    "lint": "eslint --ext=.ts --ext=.tsx src"
+    "lint": "eslint --ext=.ts --ext=.tsx src",
+    "prettify": "prettier --write 'src/**/*.ts*'"
   },
   "dependencies": {
     "axios": "^0.19.0",

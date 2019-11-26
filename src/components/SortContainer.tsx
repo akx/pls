@@ -12,10 +12,7 @@ const SortContainer: React.FunctionComponent<SortContainerProps> = ({ sort, setS
   <div className="sort">
     <label>
       <span>Sort: &nbsp;</span>
-      <select
-        value={sort}
-        onChange={e => setSort(e.target.value, reverse)}
-      >
+      <select value={sort} onBlur={e => setSort(e.target.value, reverse)}>
         <option value="original">Original sort</option>
         {SORT_FIELDS.map(f => (
           <option key={f} value={f}>
@@ -25,11 +22,7 @@ const SortContainer: React.FunctionComponent<SortContainerProps> = ({ sort, setS
       </select>
     </label>
     <label>
-      <input
-        type="checkbox"
-        checked={reverse}
-        onChange={e => setSort(sort, e.target.checked)}
-      />
+      <input type="checkbox" checked={reverse} onBlur={e => setSort(sort, e.target.checked)} />
       <span>Reverse</span>
     </label>
   </div>

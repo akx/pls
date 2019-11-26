@@ -3,6 +3,7 @@ import Error from './Error';
 import Request from '../utils/request';
 
 interface RequestStatusProps {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   request: Request<any, any, any>;
   progressMessage: string;
   errorMessage?: string;
