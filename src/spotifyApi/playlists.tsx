@@ -12,10 +12,11 @@ export function getPlaylists(limit = 0xffff): PlaylistsRequest {
 }
 
 export function getPlaylist(userId: string, playlistId: string): Request<Playlist> {
-  const plPromise = requestAuthenticated<Playlist>({
-    url: `https://api.spotify.com/v1/users/${userId}/playlists/${playlistId}`,
-  }).then(({ data }) => data);
-  return new Request<Playlist>(plPromise);
+  return new Request<Playlist>(
+    requestAuthenticated<Playlist>({
+      url: `https://api.spotify.com/v1/users/${userId}/playlists/${playlistId}`,
+    }).then(({ data }) => data),
+  );
 }
 
 export function getPlaylistEntries(userId: string, playlistId: string, limit = 0xffff): PlaylistEntriesRequest {
@@ -50,22 +51,21 @@ export async function createPlaylistWithTracks(title: string, spotifyUris: reado
   const newPlaylistId = data.id;
   const spotifyUriChunks = chunk(spotifyUris, 100);
   return new Promise(resolve => {
-    const tick = () => {
+    async function postNextChunk() {
       if (!spotifyUriChunks.length) {
         resolve(true);
         return;
       }
       const spotifyUriChunk = spotifyUriChunks.shift();
-      requestAuthenticated({
+      await requestAuthenticated({
         method: 'POST',
         url: `https://api.spotify.com/v1/users/${userName}/playlists/${newPlaylistId}/tracks`,
         data: {
           uris: spotifyUriChunk,
         },
-      }).then(() => {
-        setTimeout(tick, 16);
       });
-    };
-    tick();
+      setTimeout(postNextChunk, 16);
+    }
+    postNextChunk();
   });
 }

@@ -47,12 +47,30 @@ interface PlaylistEntriesProps {
 
 interface PlaylistEntriesState {
   playlistEntriesRequest: PlaylistEntriesRequest | null;
-  trackDetailsRequest: Request<AudioFeatureMap> | null;
+  trackDetailsRequest: Request<void> | null;
   playlistEntries?: PlaylistEntry[];
   sort: string;
   reverse: boolean;
   filters: { [key: string]: string };
   colorize: boolean;
+}
+
+async function createNewPlaylist(entries: readonly AugmentedPlaylistEntry[]) {
+  const spotifyUris = entries.map(ent => ent.uri).filter(uri => uri);
+  if (!spotifyUris.length) {
+    alert('No tracks to create a playlist from.');
+    return;
+  }
+  const title = prompt('What should the new playlist be called?');
+  if (!title) {
+    return;
+  }
+  try {
+    await createPlaylistWithTracks(title, spotifyUris);
+  } catch (err) {
+    console.error(err);
+    alert(`Error creating playlist: ${err}`);
+  }
 }
 
 export default class PlaylistEntries extends React.Component<PlaylistEntriesProps, PlaylistEntriesState> {
@@ -95,26 +113,6 @@ export default class PlaylistEntries extends React.Component<PlaylistEntriesProp
       this.setState({ trackDetailsRequest: null });
     });
     this.setState({ trackDetailsRequest });
-  }
-
-  private createNewPlaylist(entries: readonly AugmentedPlaylistEntry[]) {
-    const spotifyUris = entries.map(ent => ent.uri).filter(uri => uri);
-    if (!spotifyUris.length) {
-      alert('No tracks to create a playlist from.');
-      return false;
-    }
-    const title = prompt('What should the new playlist be called?');
-    if (!title) {
-      return false;
-    }
-    return createPlaylistWithTracks(title, spotifyUris)
-      .then(() => {
-        alert('Playlist successfully created. :)');
-      })
-      .catch(err => {
-        console.error(err);
-        alert(`Error creating playlist: ${err}`);
-      });
   }
 
   private downloadEntriesJSON(playlistEntries: readonly AugmentedPlaylistEntry[]) {
@@ -201,7 +199,7 @@ export default class PlaylistEntries extends React.Component<PlaylistEntriesProp
         />
         <fieldset className="tools">
           <legend>Tools</legend>
-          <button disabled={entries.length === 0} onClick={() => this.createNewPlaylist(entries)}>
+          <button disabled={entries.length === 0} onClick={() => createNewPlaylist(entries)}>
             Create New Playlist of {entries.length} Tracks
           </button>
           <button disabled={entries.length === 0} onClick={() => this.downloadEntriesJSON(entries)}>
