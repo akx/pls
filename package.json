@@ -5,7 +5,8 @@
   "license": "MIT",
   "scripts": {
     "dev": "poi --serve",
-    "dist": "rm -fr dist && poi --production && ghpg -d dist",
+    "build": "poi --production",
+    "dist": "rm -fr dist && yarn build && ghpg -d dist",
     "lint": "eslint --ext=.ts --ext=.tsx src",
     "prettify": "prettier --write 'src/**/*.ts*'"
   },
