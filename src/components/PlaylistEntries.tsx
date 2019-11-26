@@ -22,7 +22,6 @@ import { getPlaylistEntries, PlaylistEntriesRequest } from '../spotifyApi/playli
 import hashcode from '../utils/hashcode';
 import { createNewPlaylistInteractive } from '../utils/playlists';
 
-
 function makeAugmentedPlaylistEntry(playlistEntry: PlaylistEntry, shuffleSeed = 0): AugmentedPlaylistEntry {
   return {
     ...playlistEntry,

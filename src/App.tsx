@@ -4,6 +4,7 @@ import { HashRouter, Route, Link } from 'react-router-dom';
 import { checkAndSaveAuth, getAuth, redirectToAuth, unauth } from './auth';
 import PlaylistListView from './views/PlaylistListView';
 import PlaylistContentView from './views/PlaylistContentView';
+import SearchToolView from './views/SearchToolView';
 
 export default class App extends React.Component {
   public UNSAFE_componentWillMount() {
@@ -25,6 +26,7 @@ export default class App extends React.Component {
         <div>
           <nav>
             <Link to="/">List Playlists</Link>
+            <Link to="/search-tool">Search Tool</Link>
             <a
               href="#"
               onClick={e => {
@@ -37,6 +39,7 @@ export default class App extends React.Component {
             </a>
           </nav>
           <article>
+            <Route path="/search-tool" exact component={SearchToolView} />
             <Route path="/playlist/:user_id/:playlist_id" component={PlaylistContentView} />
             <Route path="/" exact component={PlaylistListView} />
           </article>
