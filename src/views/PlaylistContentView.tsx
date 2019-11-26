@@ -17,11 +17,11 @@ interface PlaylistContentViewProps extends RouteComponentProps<{ user_id: string
 export default class PlaylistContentView extends React.Component<PlaylistContentViewProps, PlaylistContentViewState> {
   public state: PlaylistContentViewState = {};
 
-  componentDidMount() {
+  public componentDidMount() {
     this.loadData();
   }
 
-  loadData() {
+  private loadData() {
     const { params } = this.props.match;
     const userId = params.user_id;
     const playlistId = params.playlist_id;
@@ -32,7 +32,7 @@ export default class PlaylistContentView extends React.Component<PlaylistContent
     this.setState({ playlistRequest });
   }
 
-  render() {
+  public render() {
     const { playlistRequest } = this.state;
     if (!playlistRequest) return null;
     if (!playlistRequest.result) {

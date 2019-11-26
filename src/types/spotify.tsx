@@ -1,5 +1,9 @@
 /* eslint-disable @typescript-eslint/no-empty-interface */
 
+export interface User {
+  id: string;
+}
+
 export interface SpotifyResource {
   href: string;
 }
@@ -13,8 +17,7 @@ export interface PagedResponse<TResource> extends SpotifyResource {
   total: number;
 }
 
-export interface PlaylistsResponse extends PagedResponse<Playlist> {
-}
+export interface PlaylistsResponse extends PagedResponse<Playlist> {}
 
 export interface Playlist extends SpotifyResource {
   collaborative: boolean;
@@ -53,8 +56,7 @@ export interface Owner {
   uri: string;
 }
 
-export interface PlaylistTracksResponse extends PagedResponse<PlaylistEntry> {
-}
+export interface PlaylistTracksResponse extends PagedResponse<PlaylistEntry> {}
 
 export interface PlaylistEntry {
   originalIndex?: number; // _not_ in response data!

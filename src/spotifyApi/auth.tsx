@@ -1,8 +1,7 @@
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 import axios, { AxiosRequestConfig } from 'axios';
 import { getAuth } from '../auth';
 
-export function requestAuthenticated<TResponse = any>(options: Partial<AxiosRequestConfig>) {
+export function requestAuthenticated<TResponse>(options: Partial<AxiosRequestConfig>) {
   const auth = getAuth();
   if (!(auth && auth.access_token)) {
     return Promise.reject(new Error('Not authenticated'));

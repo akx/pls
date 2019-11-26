@@ -9,7 +9,7 @@ export interface AudioFeatureMap {
 class AudioFeaturesService {
   private readonly cache: Map<string, AudioFeature | null> = new Map();
 
-  ensureLoaded(trackIds: readonly string[]): Request<AudioFeatureMap> {
+  public ensureLoaded(trackIds: readonly string[]): Request<AudioFeatureMap> {
     trackIds = trackIds.filter(id => id);
     return new Request((resolve, reject, request) => {
       const tick = () => {
@@ -54,7 +54,7 @@ class AudioFeaturesService {
     });
   }
 
-  getDetails(trackId: string): AudioFeature | undefined {
+  public getDetails(trackId: string): AudioFeature | undefined {
     return this.cache.get(trackId) || undefined;
   }
 }

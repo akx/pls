@@ -11,7 +11,7 @@ import SortAndFilterForm from './SortAndFilterForm';
 
 import TrackDetailsService, { AudioFeatureMap } from '../services/AudioFeaturesService';
 import { DETAILS_FIELDS, QUANTIFIABLE_NUMERIC_FIELDS } from '../consts';
-import { formatDuration, formatTitle } from '../utils/format';
+import { formatTitle } from '../utils/format';
 import { Playlist, PlaylistEntry } from '../types/spotify';
 import { AugmentedPlaylistEntry } from '../types/pls';
 import Request from '../utils/request';
@@ -91,7 +91,7 @@ export default class PlaylistEntries extends React.Component<PlaylistEntriesProp
     trackDetailsRequest.onProgress.push(() => {
       this.forceUpdate();
     });
-    trackDetailsRequest.onComplete.push(tdMap => {
+    trackDetailsRequest.onComplete.push(() => {
       this.setState({ trackDetailsRequest: null });
     });
     this.setState({ trackDetailsRequest });
@@ -117,7 +117,7 @@ export default class PlaylistEntries extends React.Component<PlaylistEntriesProp
       });
   }
 
-  downloadEntriesJSON(playlistEntries: readonly AugmentedPlaylistEntry[]) {
+  private downloadEntriesJSON(playlistEntries: readonly AugmentedPlaylistEntry[]) {
     const { playlist } = this.props;
     const jsonData = JSON.stringify(playlistEntries, null, 2);
     const blob = new Blob([jsonData], { type: 'application/json' });
@@ -155,7 +155,7 @@ export default class PlaylistEntries extends React.Component<PlaylistEntriesProp
     return entries;
   }
 
-  render() {
+  public render() {
     const { playlistEntries, playlistEntriesRequest, trackDetailsRequest, colorize } = this.state;
     if (!playlistEntriesRequest) return null;
     if (!playlistEntriesRequest.result) {
