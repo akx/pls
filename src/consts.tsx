@@ -15,7 +15,7 @@ export const DETAILS_FIELDS = [
   'popularity',
 ];
 
-export const SORT_FIELDS = ['name', 'artistName', 'albumName', 'duration_ms'].concat(DETAILS_FIELDS);
+export const SORT_FIELDS = ['name', 'artistName', 'albumName', 'duration_ms', 'shuffleHash'].concat(DETAILS_FIELDS);
 
 export const NUMERIC_FILTER_FIELDS = ['duration_ms'].concat(DETAILS_FIELDS);
 

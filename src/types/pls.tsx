@@ -6,4 +6,5 @@ export interface AugmentedPlaylistEntry
     Partial<Omit<AudioFeature, 'id' | 'track_uri' | 'duration_ms' | 'type' | 'uri'>> {
   artistName: string;
   albumName: string;
+  shuffleHash: number;
 }

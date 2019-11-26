@@ -9,7 +9,7 @@ import update from 'immutability-helper';
 import RequestStatus from './RequestStatus';
 import SortAndFilterForm from './SortAndFilterForm';
 
-import TrackDetailsService, { AudioFeatureMap } from '../services/AudioFeaturesService';
+import TrackDetailsService from '../services/AudioFeaturesService';
 import { DETAILS_FIELDS, QUANTIFIABLE_NUMERIC_FIELDS } from '../consts';
 import { formatTitle } from '../utils/format';
 import { Playlist, PlaylistEntry } from '../types/spotify';
@@ -19,14 +19,16 @@ import { downloadBlob } from '../utils/blobs';
 import { NumberLimits } from './types';
 import PlaylistEntriesTableRow from './PlaylistEntriesTableRow';
 import { createPlaylistWithTracks, getPlaylistEntries, PlaylistEntriesRequest } from '../spotifyApi/playlists';
+import hashcode from '../utils/hashcode';
 
-function makeAugmentedPlaylistEntry(playlistEntry: PlaylistEntry): AugmentedPlaylistEntry {
+function makeAugmentedPlaylistEntry(playlistEntry: PlaylistEntry, shuffleSeed = 0): AugmentedPlaylistEntry {
   return {
     ...playlistEntry,
     ...playlistEntry.track,
     ...(TrackDetailsService.getDetails(playlistEntry.track.id) || {}),
     artistName: playlistEntry.track.artists.map(a => a.name).join(', '),
     albumName: playlistEntry.track.album.name,
+    shuffleHash: hashcode(shuffleSeed, `${playlistEntry.originalIndex}-${playlistEntry.track}`),
   };
 }
 
@@ -50,6 +52,7 @@ interface PlaylistEntriesState {
   trackDetailsRequest: Request<void> | null;
   playlistEntries?: PlaylistEntry[];
   sort: string;
+  shuffleSeed: number;
   reverse: boolean;
   filters: { [key: string]: string };
   colorize: boolean;
@@ -79,6 +82,7 @@ export default class PlaylistEntries extends React.Component<PlaylistEntriesProp
     trackDetailsRequest: null,
     sort: 'original',
     reverse: false,
+    shuffleSeed: Math.random() * 42,
     filters: {},
     colorize: false,
   };
@@ -124,7 +128,8 @@ export default class PlaylistEntries extends React.Component<PlaylistEntriesProp
   }
 
   private sortAndFilterEntries(playlistEntries: readonly PlaylistEntry[]): AugmentedPlaylistEntry[] {
-    const filterPairs = toPairs(this.state.filters).filter(([, value]) => value !== '');
+    const { sort, filters, reverse: reverseFlag, shuffleSeed } = this.state;
+    const filterPairs = toPairs(filters).filter(([, value]) => value !== '');
     const filterEntry = (entry: AugmentedPlaylistEntry) =>
       filterPairs.every(([key, value]) => {
         const [field, op] = key.split(':');
@@ -142,12 +147,12 @@ export default class PlaylistEntries extends React.Component<PlaylistEntriesProp
         console.warn(key, field, op, value);
         return true;
       });
-    let entries = (playlistEntries || []).map(makeAugmentedPlaylistEntry).filter(filterEntry);
-    if (this.state.sort !== 'original') {
-      const sortKey = this.state.sort;
+    let entries = (playlistEntries || []).map(ple => makeAugmentedPlaylistEntry(ple, shuffleSeed)).filter(filterEntry);
+    if (sort !== 'original') {
+      const sortKey = sort;
       entries = sortBy(entries, entry => get(entry, sortKey));
     }
-    if (this.state.reverse) {
+    if (reverseFlag) {
       entries = reverse(entries);
     }
     return entries;
@@ -191,6 +196,7 @@ export default class PlaylistEntries extends React.Component<PlaylistEntriesProp
           filters={this.state.filters}
           /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
           setSort={(key, reverse) => this.setState({ sort: key, reverse })}
+          setShuffleSeed={shuffleSeed => this.setState({ sort: 'shuffleHash', shuffleSeed })}
           setFilterValue={(key, value) => {
             const updateCommand = value === '' ? { $unset: [key] } : { [key]: { $set: value } };
             const newFilters = update(this.state.filters, updateCommand);
