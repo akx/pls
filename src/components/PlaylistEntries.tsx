@@ -18,8 +18,10 @@ import Request from '../utils/request';
 import { downloadBlob } from '../utils/blobs';
 import { NumberLimits } from './types';
 import PlaylistEntriesTableRow from './PlaylistEntriesTableRow';
-import { createPlaylistWithTracks, getPlaylistEntries, PlaylistEntriesRequest } from '../spotifyApi/playlists';
+import { getPlaylistEntries, PlaylistEntriesRequest } from '../spotifyApi/playlists';
 import hashcode from '../utils/hashcode';
+import { createNewPlaylistInteractive } from '../utils/playlists';
+
 
 function makeAugmentedPlaylistEntry(playlistEntry: PlaylistEntry, shuffleSeed = 0): AugmentedPlaylistEntry {
   return {
@@ -56,24 +58,6 @@ interface PlaylistEntriesState {
   reverse: boolean;
   filters: { [key: string]: string };
   colorize: boolean;
-}
-
-async function createNewPlaylist(entries: readonly AugmentedPlaylistEntry[]) {
-  const spotifyUris = entries.map(ent => ent.uri).filter(uri => uri);
-  if (!spotifyUris.length) {
-    alert('No tracks to create a playlist from.');
-    return;
-  }
-  const title = prompt('What should the new playlist be called?');
-  if (!title) {
-    return;
-  }
-  try {
-    await createPlaylistWithTracks(title, spotifyUris);
-  } catch (err) {
-    console.error(err);
-    alert(`Error creating playlist: ${err}`);
-  }
 }
 
 export default class PlaylistEntries extends React.Component<PlaylistEntriesProps, PlaylistEntriesState> {
@@ -205,7 +189,10 @@ export default class PlaylistEntries extends React.Component<PlaylistEntriesProp
         />
         <fieldset className="tools">
           <legend>Tools</legend>
-          <button disabled={entries.length === 0} onClick={() => createNewPlaylist(entries)}>
+          <button
+            disabled={entries.length === 0}
+            onClick={() => createNewPlaylistInteractive(entries.map(ent => ent.uri).filter(Boolean))}
+          >
             Create New Playlist of {entries.length} Tracks
           </button>
           <button disabled={entries.length === 0} onClick={() => this.downloadEntriesJSON(entries)}>
