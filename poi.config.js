@@ -17,6 +17,6 @@ module.exports = (options, req) => ({
     SPOTIFY_CLIENT_ID: process.env.SPOTIFY_CLIENT_ID,
   },
   output: {
-    publicUrl: './',
+    publicUrl: 'https://akx.github.io/pls/',
   },
 });
