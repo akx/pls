@@ -27,12 +27,12 @@ export default class SearchToolView extends React.Component<{}, SearchToolViewSt
     const types = [this.state.searchAlbums ? 'album' : '', this.state.searchTracks ? 'track' : ''].filter(Boolean);
     const queryStrings = this.state.searchContent
       .split('\n')
-      .map(line => line.trim())
+      .map((line) => line.trim())
       .filter(Boolean);
-    const extantQueryStrings = new Set(this.state.queries.map(q => q.query));
+    const extantQueryStrings = new Set(this.state.queries.map((q) => q.query));
     const newQueries: SearchQuery[] = [];
     if (!types.length) return;
-    queryStrings.forEach(query => {
+    queryStrings.forEach((query) => {
       if (extantQueryStrings.has(query)) {
         return;
       }
@@ -46,7 +46,7 @@ export default class SearchToolView extends React.Component<{}, SearchToolViewSt
       });
     });
     if (!newQueries.length) return;
-    this.setState(state => ({ queries: state.queries.concat(newQueries) }));
+    this.setState((state) => ({ queries: state.queries.concat(newQueries) }));
   };
 
   public render() {
@@ -55,7 +55,7 @@ export default class SearchToolView extends React.Component<{}, SearchToolViewSt
         <div style={{ maxWidth: '350px', flex: 1 }}>
           <textarea
             value={this.state.searchContent}
-            onChange={e => this.setState({ searchContent: e.target.value })}
+            onChange={(e) => this.setState({ searchContent: e.target.value })}
             rows={10}
             style={{ width: '100%' }}
             placeholder="Enter search queries here."
@@ -68,7 +68,7 @@ export default class SearchToolView extends React.Component<{}, SearchToolViewSt
             <input
               type="checkbox"
               checked={this.state.searchAlbums}
-              onChange={e => this.setState({ searchAlbums: e.target.checked })}
+              onChange={(e) => this.setState({ searchAlbums: e.target.checked })}
             />
             Albums
           </label>
@@ -76,7 +76,7 @@ export default class SearchToolView extends React.Component<{}, SearchToolViewSt
             <input
               type="checkbox"
               checked={this.state.searchTracks}
-              onChange={e => this.setState({ searchTracks: e.target.checked })}
+              onChange={(e) => this.setState({ searchTracks: e.target.checked })}
             />
             Tracks
           </label>
@@ -91,7 +91,7 @@ export default class SearchToolView extends React.Component<{}, SearchToolViewSt
         </div>
         <div style={{ flex: 3 }}>
           <ul>
-            {this.state.queries.map(q => (
+            {this.state.queries.map((q) => (
               <SearchResultRow
                 key={q.query}
                 query={q}
@@ -104,7 +104,7 @@ export default class SearchToolView extends React.Component<{}, SearchToolViewSt
         </div>
         <div style={{ flex: 3 }}>
           <ul>
-            {this.state.playlist.map(t => (
+            {this.state.playlist.map((t) => (
               <li key={t.id}>
                 {formatArtists(t.artists)} &ndash; {t.name}
               </li>
@@ -121,29 +121,29 @@ export default class SearchToolView extends React.Component<{}, SearchToolViewSt
   };
 
   private addTracks = (tracks: readonly Track[]) => {
-    this.setState(state => {
+    this.setState((state) => {
       // TODO: fix O(n^2)
-      const newTracks = tracks.filter(track => !state.playlist.find(plt => plt.id === track.id));
+      const newTracks = tracks.filter((track) => !state.playlist.find((plt) => plt.id === track.id));
       return { playlist: state.playlist.concat(newTracks) };
     });
   };
 
   private onAddAlbum = (album: Album) => {
     const albumReq = getAlbum(album.id);
-    albumReq.onComplete.push(albumDetail => {
+    albumReq.onComplete.push((albumDetail) => {
       this.addTracks(albumDetail.tracks.items);
     });
   };
 
   private savePlaylist = () => {
-    const spotifyUris = this.state.playlist.map(track => track.uri).filter(Boolean);
+    const spotifyUris = this.state.playlist.map((track) => track.uri).filter(Boolean);
     return createNewPlaylistInteractive(spotifyUris);
   };
 
   private onDeleteQuery = (query: SearchQuery) => {
-    this.setState(state => {
+    this.setState((state) => {
       this.setState({
-        queries: state.queries.filter(q => q !== query),
+        queries: state.queries.filter((q) => q !== query),
       });
     });
   };
@@ -151,7 +151,7 @@ export default class SearchToolView extends React.Component<{}, SearchToolViewSt
   private removeQueriesWithResults = () => {
     this.setState(({ queries }) => {
       this.setState({
-        queries: queries.filter(q => {
+        queries: queries.filter((q) => {
           const result = q.request.result;
           if (result === undefined) return true; // keep ones still loading
           if (result.albums?.items.length) return false;

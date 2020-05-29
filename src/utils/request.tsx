@@ -17,6 +17,10 @@ type PromiseOrExecutor<TResult, TError, TProgress extends Progress> =
   | Promise<TResult>
   | Executor<TResult, TError, TProgress>;
 
+function isPromise(value: any): value is Promise<any> {
+  return value && value.then && typeof value.then === 'function';
+}
+
 export default class Request<TResult, TError = Error, TProgress extends Progress = Progress> {
   public progress: TProgress | undefined;
   public cancelRequested = false;
@@ -34,8 +38,8 @@ export default class Request<TResult, TError = Error, TProgress extends Progress
 
   private _initializePromise(promiseOrExecutor: PromiseOrExecutor<TResult, TError, TProgress>): Promise<TResult> {
     let promise: Promise<TResult>;
-    if ((promiseOrExecutor as Promise<TResult>).then) {
-      promise = promiseOrExecutor as Promise<TResult>;
+    if (isPromise(promiseOrExecutor)) {
+      promise = promiseOrExecutor;
     } else {
       const executor = promiseOrExecutor as Executor<TResult, TError, TProgress>;
       promise = new Promise<TResult>((resolve, reject) => executor(resolve, reject, this));
@@ -46,21 +50,21 @@ export default class Request<TResult, TError = Error, TProgress extends Progress
   private _handleResolve = (result: TResult) => {
     this.busy = false;
     this.result = result;
-    this.onComplete.forEach(completeCb => completeCb(result));
+    this.onComplete.forEach((completeCb) => completeCb(result));
     return result;
   };
 
   private _handleError = (err: TError) => {
     this.busy = false;
     this.error = err;
-    this.onError.forEach(errorCb => errorCb(err));
+    this.onError.forEach((errorCb) => errorCb(err));
     return Promise.reject(err);
   };
 
   public reportProgress(progress: TProgress | undefined) {
     this.progress = progress;
     if (progress !== undefined) {
-      this.onProgress.forEach(fn => fn(progress));
+      this.onProgress.forEach((fn) => fn(progress));
     }
   }
 

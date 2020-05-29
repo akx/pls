@@ -6,14 +6,14 @@ import { FilterProps } from './types';
 const NumericFiltersTable: React.FC<FilterProps> = ({ filters, setFilterValue }) => {
   const lteFields: React.ReactChild[] = [];
   const gteFields: React.ReactChild[] = [];
-  NUMERIC_FILTER_FIELDS.forEach(f => {
+  NUMERIC_FILTER_FIELDS.forEach((f) => {
     gteFields.push(
       <td key={f}>
         <input
           type="number"
           value={filters[`${f}:gte`] || ''}
           size={3}
-          onChange={e => {
+          onChange={(e) => {
             setFilterValue(`${f}:gte`, e.target.value);
           }}
         />
@@ -25,7 +25,7 @@ const NumericFiltersTable: React.FC<FilterProps> = ({ filters, setFilterValue })
           type="number"
           value={filters[`${f}:lte`] || ''}
           size={3}
-          onChange={e => {
+          onChange={(e) => {
             setFilterValue(`${f}:lte`, e.target.value);
           }}
         />
@@ -37,7 +37,7 @@ const NumericFiltersTable: React.FC<FilterProps> = ({ filters, setFilterValue })
       <thead>
         <tr>
           <th />
-          {NUMERIC_FILTER_FIELDS.map(f => (
+          {NUMERIC_FILTER_FIELDS.map((f) => (
             <th key={f}>{formatTitle(f)}</th>
           ))}
         </tr>

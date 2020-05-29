@@ -5,12 +5,12 @@ import { FilterProps } from './types';
 
 const StringFiltersTable: React.FunctionComponent<FilterProps> = ({ filters, setFilterValue }) => (
   <div className="string-filters">
-    {STRING_FILTER_FIELDS.map(f => (
+    {STRING_FILTER_FIELDS.map((f) => (
       <input
         key={f}
         placeholder={`${formatTitle(f)} contains...`}
         value={filters[`${f}:contains`] || ''}
-        onChange={e => {
+        onChange={(e) => {
           setFilterValue(`${f}:contains`, e.target.value);
         }}
       />

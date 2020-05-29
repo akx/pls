@@ -26,7 +26,7 @@ export default class PlaylistContentView extends React.Component<PlaylistContent
     const userId = params.user_id;
     const playlistId = params.playlist_id;
     const playlistRequest = getPlaylist(userId, playlistId);
-    playlistRequest.onComplete.push(playlist => {
+    playlistRequest.onComplete.push((playlist) => {
       this.setState({ playlist });
     });
     this.setState({ playlistRequest });

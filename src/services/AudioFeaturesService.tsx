@@ -15,12 +15,12 @@ async function doFeaturesQuery(cache: AudioFeatureCache, trackIdsToQuery: readon
       ids: trackIdsToQuery.join(','),
     },
   });
-  data.audio_features.forEach(fobj => {
+  data.audio_features.forEach((fobj) => {
     if (fobj) {
       cache.set(fobj.id, fobj);
     }
   });
-  trackIdsToQuery.forEach(id => {
+  trackIdsToQuery.forEach((id) => {
     if (!cache.has(id)) {
       console.warn(`No analysis available for ${id}`);
       cache.set(id, null);
@@ -34,7 +34,7 @@ class AudioFeaturesService {
   public ensureLoaded(trackIds: readonly string[]): Request<void> {
     return new Request((resolve, reject, request) => {
       const loadRemainingFeatures = async () => {
-        const newTrackIds = trackIds.filter(trackId => trackId && !this.cache.has(trackId));
+        const newTrackIds = trackIds.filter((trackId) => trackId && !this.cache.has(trackId));
         request.reportProgress({
           loaded: trackIds.length - newTrackIds.length,
           total: trackIds.length,

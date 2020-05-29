@@ -6,7 +6,7 @@ import { FilterProps } from './types';
 
 interface SortAndFilterFormProps extends FilterProps, SortContainerProps {}
 
-const SortAndFilterForm: React.FC<SortAndFilterFormProps> = props => (
+const SortAndFilterForm: React.FC<SortAndFilterFormProps> = (props) => (
   <fieldset className="sort-and-filter">
     <legend>Sort & Filter</legend>
     <SortContainer {...props} />

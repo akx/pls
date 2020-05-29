@@ -29,7 +29,7 @@ export default class App extends React.Component {
             <Link to="/search-tool">Search Tool</Link>
             <a
               href="#"
-              onClick={e => {
+              onClick={(e) => {
                 unauth();
                 this.forceUpdate();
                 e.preventDefault();

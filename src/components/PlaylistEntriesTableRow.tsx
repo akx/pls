@@ -22,11 +22,11 @@ const PlaylistEntriesTableRow: React.FunctionComponent<PlaylistEntriesTableProps
   return (
     <tr key={entry.originalIndex}>
       <td>{(entry.originalIndex || 0) + 1}</td>
-      <td>{entry.artists.map(a => a.name).join(', ')}</td>
+      <td>{entry.artists.map((a) => a.name).join(', ')}</td>
       <td>{entry.name}</td>
       <td>{entry.album ? entry.album.name : null}</td>
       <td>{formatDuration(entry.duration_ms)}</td>
-      {DETAILS_FIELDS.map(f => {
+      {DETAILS_FIELDS.map((f) => {
         const value = entry[f as keyof AugmentedPlaylistEntry];
         const className =
           colorize && numberLimits[f]

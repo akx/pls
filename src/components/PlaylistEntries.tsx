@@ -27,7 +27,7 @@ function makeAugmentedPlaylistEntry(playlistEntry: PlaylistEntry, shuffleSeed = 
     ...playlistEntry,
     ...playlistEntry.track,
     ...(TrackDetailsService.getDetails(playlistEntry.track.id) || {}),
-    artistName: playlistEntry.track.artists.map(a => a.name).join(', '),
+    artistName: playlistEntry.track.artists.map((a) => a.name).join(', '),
     albumName: playlistEntry.track.album.name,
     shuffleHash: hashcode(shuffleSeed, `${playlistEntry.originalIndex}-${playlistEntry.track}`),
   };
@@ -35,7 +35,7 @@ function makeAugmentedPlaylistEntry(playlistEntry: PlaylistEntry, shuffleSeed = 
 
 function calculateNumberLimits(entries: AugmentedPlaylistEntry[]) {
   const limits: NumberLimits = {};
-  QUANTIFIABLE_NUMERIC_FIELDS.forEach(field => {
+  QUANTIFIABLE_NUMERIC_FIELDS.forEach((field) => {
     const values = map(entries, field);
     const min = Math.min.apply(null, values);
     const max = Math.max.apply(null, values);
@@ -81,7 +81,7 @@ export default class PlaylistEntries extends React.Component<PlaylistEntriesProp
     playlistEntriesRequest.onProgress.push(() => {
       this.forceUpdate();
     });
-    playlistEntriesRequest.onComplete.push(playlistEntries => {
+    playlistEntriesRequest.onComplete.push((playlistEntries) => {
       this.setState({ playlistEntries });
       this.loadTrackDetails();
     });
@@ -89,7 +89,7 @@ export default class PlaylistEntries extends React.Component<PlaylistEntriesProp
   }
 
   private loadTrackDetails() {
-    const trackIds = (this.state.playlistEntries || []).map(ple => ple.track.id);
+    const trackIds = (this.state.playlistEntries || []).map((ple) => ple.track.id);
     if (!trackIds.length) return;
     const trackDetailsRequest = TrackDetailsService.ensureLoaded(trackIds);
 
@@ -130,10 +130,12 @@ export default class PlaylistEntries extends React.Component<PlaylistEntriesProp
         console.warn(key, field, op, value);
         return true;
       });
-    let entries = (playlistEntries || []).map(ple => makeAugmentedPlaylistEntry(ple, shuffleSeed)).filter(filterEntry);
+    let entries = (playlistEntries || [])
+      .map((ple) => makeAugmentedPlaylistEntry(ple, shuffleSeed))
+      .filter(filterEntry);
     if (sort !== 'original') {
       const sortKey = sort;
-      entries = sortBy(entries, entry => get(entry, sortKey));
+      entries = sortBy(entries, (entry) => get(entry, sortKey));
     }
     if (reverseFlag) {
       entries = reverse(entries);
@@ -179,7 +181,7 @@ export default class PlaylistEntries extends React.Component<PlaylistEntriesProp
           filters={this.state.filters}
           /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
           setSort={(key, reverse) => this.setState({ sort: key, reverse })}
-          setShuffleSeed={shuffleSeed => this.setState({ sort: 'shuffleHash', shuffleSeed })}
+          setShuffleSeed={(shuffleSeed) => this.setState({ sort: 'shuffleHash', shuffleSeed })}
           setFilterValue={(key, value) => {
             const updateCommand = value === '' ? { $unset: [key] } : { [key]: { $set: value } };
             const newFilters = update(this.state.filters, updateCommand);
@@ -190,7 +192,7 @@ export default class PlaylistEntries extends React.Component<PlaylistEntriesProp
           <legend>Tools</legend>
           <button
             disabled={entries.length === 0}
-            onClick={() => createNewPlaylistInteractive(entries.map(ent => ent.uri).filter(Boolean))}
+            onClick={() => createNewPlaylistInteractive(entries.map((ent) => ent.uri).filter(Boolean))}
           >
             Create New Playlist of {entries.length} Tracks
           </button>
@@ -198,7 +200,7 @@ export default class PlaylistEntries extends React.Component<PlaylistEntriesProp
             Export JSON Track Data
           </button>
           <label>
-            <input type="checkbox" checked={colorize} onChange={e => this.setState({ colorize: e.target.checked })} />
+            <input type="checkbox" checked={colorize} onChange={(e) => this.setState({ colorize: e.target.checked })} />
             Colorize Numbers
           </label>
         </fieldset>
@@ -210,13 +212,13 @@ export default class PlaylistEntries extends React.Component<PlaylistEntriesProp
               <th>Track</th>
               <th>Album</th>
               <th>Duration</th>
-              {DETAILS_FIELDS.map(f => (
+              {DETAILS_FIELDS.map((f) => (
                 <th key={f}>{formatTitle(f)}</th>
               ))}
             </tr>
           </thead>
           <tbody>
-            {entries.map(entry => (
+            {entries.map((entry) => (
               <PlaylistEntriesTableRow
                 entry={entry}
                 key={entry.originalIndex}

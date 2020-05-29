@@ -19,7 +19,7 @@ export function loadPagedResource<TResource>(
           url,
           params: { ...params, limit: requestLimit, offset },
         });
-        data.items.forEach(item => items.push(item));
+        data.items.forEach((item) => items.push(item));
         request.reportProgress({
           total: data.total,
           loaded: items.length,

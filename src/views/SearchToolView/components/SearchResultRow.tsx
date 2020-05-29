@@ -10,17 +10,17 @@ interface SearchResultRowProps {
   onDeleteQuery: (query: SearchQuery) => void;
 }
 
-export const formatArtists = (artists: Artist[]) => artists.map(a => a.name).join(', ');
+export const formatArtists = (artists: Artist[]) => artists.map((a) => a.name).join(', ');
 
 function getAlbumRows(albums: readonly Album[], onAddAlbum: (album: Album) => void) {
-  return albums.map(album => (
+  return albums.map((album) => (
     <li key={album.id}>
       <>
         {upperFirst(album.album_type)}: {formatArtists(album.artists)} &ndash; {album.name} ({album.total_tracks}{' '}
         tracks)
         <a
           href="#"
-          onClick={event => {
+          onClick={(event) => {
             onAddAlbum(album);
             event.preventDefault();
           }}
@@ -33,13 +33,13 @@ function getAlbumRows(albums: readonly Album[], onAddAlbum: (album: Album) => vo
 }
 
 function getTrackRows(tracks: readonly Track[], onAddTrack: (track: Track) => void) {
-  return tracks.map(track => (
+  return tracks.map((track) => (
     <li key={track.id}>
       <>
         Track: {formatArtists(track.artists)} &ndash; {track.name} ({track.album.name})
         <a
           href="#"
-          onClick={event => {
+          onClick={(event) => {
             onAddTrack(track);
             event.preventDefault();
           }}
@@ -66,7 +66,7 @@ export const SearchResultRow: React.FunctionComponent<SearchResultRowProps> = ({
       {query.query} – {query.request.busy ? 'Busy...' : `${albums.length} albums, ${tracks.length} tracks`}{' '}
       <a
         href="#"
-        onClick={e => {
+        onClick={(e) => {
           setCollapsed(!collapsed);
           e.preventDefault();
         }}
@@ -75,7 +75,7 @@ export const SearchResultRow: React.FunctionComponent<SearchResultRowProps> = ({
       </a>{' '}
       <a
         href="#"
-        onClick={e => {
+        onClick={(e) => {
           onDeleteQuery(query);
           e.preventDefault();
         }}

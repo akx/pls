@@ -18,7 +18,7 @@ export default class PlaylistListView extends React.Component<{}, PlaylistListVi
 
   private loadData() {
     const playlistsRequest = getPlaylists();
-    playlistsRequest.onComplete.push(playlists => {
+    playlistsRequest.onComplete.push((playlists) => {
       this.setState({ playlists });
     });
     playlistsRequest.onProgress.push(() => {
@@ -51,7 +51,7 @@ export default class PlaylistListView extends React.Component<{}, PlaylistListVi
           </tr>
         </thead>
         <tbody>
-          {(this.state.playlists || []).map(pl => (
+          {(this.state.playlists || []).map((pl) => (
             <tr key={pl.id}>
               <td>
                 <Link to={`/playlist/${pl.owner.id}/${pl.id}`}>

@@ -26,7 +26,7 @@ export function getPlaylistEntries(userId: string, playlistId: string, limit = 0
     limit,
     100,
   );
-  req.onComplete.push(entries => {
+  req.onComplete.push((entries) => {
     for (let i = 0; i < entries.length; i += 1) {
       // eslint-disable-next-line no-param-reassign
       entries[i].originalIndex = i;
@@ -50,7 +50,7 @@ export async function createPlaylistWithTracks(title: string, spotifyUris: reado
   });
   const newPlaylistId = data.id;
   const spotifyUriChunks = chunk(spotifyUris, 100);
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     async function postNextChunk() {
       if (!spotifyUriChunks.length) {
         resolve(true);

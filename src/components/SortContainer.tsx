@@ -13,9 +13,9 @@ const SortContainer: React.FunctionComponent<SortContainerProps> = ({ sort, setS
   <div className="sort">
     <label>
       <span>Sort: &nbsp;</span>
-      <select value={sort} onChange={e => setSort(e.target.value, reverse)}>
+      <select value={sort} onChange={(e) => setSort(e.target.value, reverse)}>
         <option value="original">Original sort</option>
-        {SORT_FIELDS.map(f => (
+        {SORT_FIELDS.map((f) => (
           <option key={f} value={f}>
             {formatTitle(f)}
           </option>
@@ -23,7 +23,7 @@ const SortContainer: React.FunctionComponent<SortContainerProps> = ({ sort, setS
       </select>
     </label>
     <label>
-      <input type="checkbox" checked={reverse} onChange={e => setSort(sort, e.target.checked)} />
+      <input type="checkbox" checked={reverse} onChange={(e) => setSort(sort, e.target.checked)} />
       <span>Reverse</span>
     </label>{' '}
     <button onClick={() => setShuffleSeed(Math.random() * 133713371337)}>Shuffle</button>
