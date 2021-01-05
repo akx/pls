@@ -11,7 +11,7 @@
     "prettify": "prettier --write 'src/**/*.ts*'"
   },
   "dependencies": {
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
     "dotenv": "^8.2.0",
     "immutability-helper": "^3.0.2",
     "lodash": "^4.17.15",
