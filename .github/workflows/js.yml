@@ -7,17 +7,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1
-    - uses: borales/actions-yarn@v2.0.0
-      name: install
+    - uses: actions/setup-node@v2
       with:
-        cmd: install
-    - uses: borales/actions-yarn@v2.0.0
-      name: build
-      with:
-        cmd: build
+        node-version: '14'
+    - run: yarn
+    - run: yarn build
       env:
-        SPOTIFY_CLIENT_ID: dummy
-    - uses: borales/actions-yarn@v2.0.0
-      name: lint
-      with:
-        cmd: lint
+        VITE_SPOTIFY_CLIENT_ID: dummy
+    - run: yarn lint

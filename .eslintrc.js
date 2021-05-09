@@ -4,8 +4,7 @@ module.exports = {
     'plugin:react/recommended',
     'plugin:@typescript-eslint/recommended',
     'plugin:jsx-a11y/recommended',
-    'prettier/@typescript-eslint',
-    'plugin:prettier/recommended',
+    'prettier',
   ],
   parserOptions: {
     ecmaVersion: 2018,

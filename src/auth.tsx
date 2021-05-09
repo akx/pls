@@ -1,4 +1,4 @@
-import qs from 'querystring';
+import * as qs from './utils/querystring';
 
 export function getAuth() {
   const auth = JSON.parse(sessionStorage.plsAuth || 'null');
@@ -14,7 +14,7 @@ export function getAuth() {
 export function redirectToAuth() {
   location.href = `https://accounts.spotify.com/authorize?${qs.stringify({
     response_type: 'token',
-    client_id: process.env.SPOTIFY_CLIENT_ID,
+    client_id: `${import.meta.env.VITE_SPOTIFY_CLIENT_ID}`,
     scope: [
       'user-read-private',
       'playlist-modify-private',

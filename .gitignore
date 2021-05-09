@@ -1,5 +1,8 @@
+*.local
 *.log
+.DS_Store
 .env
 .idea
 dist
+dist-ssr
 node_modules
