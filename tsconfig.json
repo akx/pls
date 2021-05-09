@@ -1,16 +1,28 @@
 {
   "compilerOptions": {
+    "allowJs": false,
+    "allowSyntheticDefaultImports": true,
     "emitDecoratorMetadata": true,
     "esModuleInterop": true,
     "experimentalDecorators": true,
+    "forceConsistentCasingInFileNames": true,
+    "isolatedModules": true,
     "jsx": "react",
-    "module": "es2015",
-    "moduleResolution": "node",
-    "strict": true,
-    "target": "es5",
     "lib": [
-      "esnext",
-      "dom"
+      "DOM",
+      "DOM.Iterable",
+      "ESNext"
+    ],
+    "module": "ESNext",
+    "moduleResolution": "Node",
+    "noEmit": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": false,
+    "strict": true,
+    "target": "ESNext",
+    "types": [
+      "vite/client"
     ]
-  }
+  },
+  "include": ["./src"]
 }
