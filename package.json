@@ -9,7 +9,7 @@
     "serve": "vite preview",
     "dist": "rm -fr dist && yarn build && ghpg -d dist",
     "lint": "eslint --ext=.ts --ext=.tsx src",
-    "prettify": "prettier --write 'src/**/*.ts*'"
+    "prettify": "prettier --write src"
   },
   "dependencies": {
     "axios": "^0.21.1",
