@@ -2,167 +2,170 @@
 
 @font-face {
   font-family: 'Inter';
-  font-style:  normal;
+  font-style: normal;
   font-weight: 400;
   font-display: swap;
-  src: url("./fonts/Inter-Regular.woff2") format("woff2");
+  src: url('./fonts/Inter-Regular.woff2') format('woff2');
 }
 
 @font-face {
   font-family: 'Inter';
-  font-style:  italic;
+  font-style: italic;
   font-weight: 400;
   font-display: swap;
-  src: url("./fonts/Inter-Italic.woff2") format("woff2");
+  src: url('./fonts/Inter-Italic.woff2') format('woff2');
 }
 
 @font-face {
   font-family: 'Inter';
-  font-style:  normal;
+  font-style: normal;
   font-weight: 700;
   font-display: swap;
-  src: url("./fonts/Inter-Bold.woff2") format("woff2");
+  src: url('./fonts/Inter-Bold.woff2') format('woff2');
 }
 
 @font-face {
   font-family: 'Inter';
-  font-style:  italic;
+  font-style: italic;
   font-weight: 700;
   font-display: swap;
-  src: url("./fonts/Inter-BoldItalic.woff2") format("woff2");
+  src: url('./fonts/Inter-BoldItalic.woff2') format('woff2');
 }
-
 
 * {
-    box-sizing: border-box;
+  box-sizing: border-box;
 }
 
 body {
-    margin: 0;
+  margin: 0;
 }
 
 a {
-    color: #024959;
-    text-decoration: none;
+  color: #024959;
+  text-decoration: none;
 }
 
 nav {
-    padding: 0.5em;
-    background: #F24738;
+  padding: 0.5em;
+  background: #f24738;
 }
 
 nav a {
-    color: #fff;
-    margin-right: 1em;
+  color: #fff;
+  margin-right: 1em;
 }
 
 nav a:hover {
-    text-decoration: underline;
+  text-decoration: underline;
 }
 
 article {
-    padding: 0.5em;
+  padding: 0.5em;
 }
 
-body, input, button, select {
-    font: 11pt/1.1 'Inter', sans-serif;
+body,
+input,
+button,
+select {
+  font: 11pt/1.1 'Inter', sans-serif;
 }
 
 table.visual-table {
-    width: 100%;
-    border-collapse: collapse;
+  width: 100%;
+  border-collapse: collapse;
 }
 
-table.visual-table td, table.visual-table th {
-    text-align: left;
-    padding: 3px;
+table.visual-table td,
+table.visual-table th {
+  text-align: left;
+  padding: 3px;
 }
 
 table.visual-table th {
-    border-bottom: 1px solid #f2c777;
+  border-bottom: 1px solid #f2c777;
 }
 
-table.visual-table tbody tr:nth-child(2n+1) {
-    background: #f7efdf;
+table.visual-table tbody tr:nth-child(2n + 1) {
+  background: #f7efdf;
 }
 
 table.visual-table tbody tr:hover {
-    background: #f5d9a4;
+  background: #f5d9a4;
 }
 
 .request-status {
-    padding: 1em;
-    background: #f7efdf;
-    width: 100%;
-    max-width: 900px;
-    margin: auto;
+  padding: 1em;
+  background: #f7efdf;
+  width: 100%;
+  max-width: 900px;
+  margin: auto;
 }
 
 .request-status-progress-wrapper {
-    margin: 1em 0;
+  margin: 1em 0;
 }
 
 .request-status-progress-wrapper progress {
-    width: 100%;
+  width: 100%;
 }
 
 .please-auth {
-    margin: 1em;
-    padding: 1em;
-    text-align: center;
+  margin: 1em;
+  padding: 1em;
+  text-align: center;
 }
 
 .please-auth button {
-    height: 4em;
-    padding: 0 2em;
-    background: #26B857;
-    color: #fff;
-    border: none;
-    border-radius: 2em;
+  height: 4em;
+  padding: 0 2em;
+  background: #26b857;
+  color: #fff;
+  border: none;
+  border-radius: 2em;
 }
 
 table.numeric-filters {
-    width: 100%;
-    border-collapse: collapse;
+  width: 100%;
+  border-collapse: collapse;
 }
 
 table.numeric-filters td,
 table.numeric-filters th {
-    margin: 0;
-    padding: 0;
+  margin: 0;
+  padding: 0;
 }
 
 table.numeric-filters td {
-    border: 1px solid #ddd;
+  border: 1px solid #ddd;
 }
 
 table.numeric-filters th {
-    font-size: 9pt;
+  font-size: 9pt;
 }
 
 table.numeric-filters input {
-    border: none;
+  border: none;
 }
 
 .string-filters {
-    display: flex;
-    margin: 0.5em 0;
+  display: flex;
+  margin: 0.5em 0;
 }
 
 .string-filters input {
-    flex: 1;
-    margin: 2px;
+  flex: 1;
+  margin: 2px;
 }
 
-.sort-and-filter input[type=number] {
-    width: 100%;
+.sort-and-filter input[type='number'] {
+  width: 100%;
 }
 
 .sort-and-filter .filter span {
-    display: block;
+  display: block;
 }
 
 .tools button {
-    padding: 0.5em;
-    margin-right: 1em;
+  padding: 0.5em;
+  margin-right: 1em;
 }
