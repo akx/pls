@@ -1,6 +1,5 @@
 import React from 'react';
 import sortBy from 'lodash/sortBy';
-import get from 'lodash/get';
 import reverse from 'lodash/reverse';
 import toPairs from 'lodash/toPairs';
 import map from 'lodash/map';
@@ -20,7 +19,7 @@ import { NumberLimits } from './types';
 import PlaylistEntriesTableRow from './PlaylistEntriesTableRow';
 import { getPlaylistEntries, PlaylistEntriesRequest } from '../spotifyApi/playlists';
 import hashcode from '../utils/hashcode';
-import { createNewPlaylistInteractive } from '../utils/playlists';
+import { createNewPlaylistInteractive, getValueFromEntry } from '../utils/playlists';
 
 function makeAugmentedPlaylistEntry(playlistEntry: PlaylistEntry, shuffleSeed = 0): AugmentedPlaylistEntry {
   return {
@@ -122,7 +121,7 @@ export default class PlaylistEntries extends React.Component<PlaylistEntriesProp
           filterValue = parseFloat(filterValue);
           if (Number.isNaN(filterValue)) return true;
         }
-        const objectValue = entry[field as keyof AugmentedPlaylistEntry];
+        const objectValue = getValueFromEntry(entry, field);
         if (objectValue === undefined || objectValue === null) return false;
         if (op === 'gte') return objectValue >= filterValue;
         if (op === 'lte') return objectValue <= filterValue;
@@ -134,8 +133,7 @@ export default class PlaylistEntries extends React.Component<PlaylistEntriesProp
       .map((ple) => makeAugmentedPlaylistEntry(ple, shuffleSeed))
       .filter(filterEntry);
     if (sort !== 'original') {
-      const sortKey = sort;
-      entries = sortBy(entries, (entry) => get(entry, sortKey));
+      entries = sortBy(entries, (entry) => getValueFromEntry(entry, sort));
     }
     if (reverseFlag) {
       entries = reverse(entries);

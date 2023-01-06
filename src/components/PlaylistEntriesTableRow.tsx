@@ -4,6 +4,7 @@ import { AugmentedPlaylistEntry } from '../types/pls';
 import React from 'react';
 import { NumberLimits } from './types';
 import Qscale from '../utils/qscale';
+import { getValueFromEntry } from '../utils/playlists';
 
 const numQscale = new Qscale(20, [253, 147, 38], [110, 239, 112], 0.9);
 numQscale.install();
@@ -27,14 +28,14 @@ const PlaylistEntriesTableRow: React.FunctionComponent<PlaylistEntriesTableProps
       <td>{entry.album ? entry.album.name : null}</td>
       <td>{formatDuration(entry.duration_ms)}</td>
       {DETAILS_FIELDS.map((f) => {
-        const value = entry[f as keyof AugmentedPlaylistEntry];
+        const value = getValueFromEntry(entry, f);
         const className =
-          colorize && numberLimits[f]
-            ? numQscale.getClassName(value as number, numberLimits[f][0], numberLimits[f][1])
+          colorize && numberLimits[f] && typeof value === 'number'
+            ? numQscale.getClassName(value, numberLimits[f][0], numberLimits[f][1])
             : undefined;
         return (
           <td key={f} title={f} className={className}>
-            {value}
+            {value === undefined ? null : String(value)}
           </td>
         );
       })}
