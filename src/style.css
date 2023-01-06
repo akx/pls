@@ -83,6 +83,7 @@ table.visual-table th {
 
 table.visual-table th {
   border-bottom: 1px solid #f2c777;
+  white-space: nowrap;
 }
 
 table.visual-table tbody tr:nth-child(2n + 1) {
