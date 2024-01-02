@@ -1,7 +1,7 @@
 import React from 'react';
 import { HashRouter, Route, Link } from 'react-router-dom';
 
-import { checkAndSaveAuth, getAuth, redirectToAuth, unauth } from './auth';
+import { checkAndSaveAuth, getAuth, hasClientId, redirectToAuth, unauth } from './auth';
 import PlaylistListView from './views/PlaylistListView';
 import PlaylistContentView from './views/PlaylistContentView';
 import SearchToolView from './views/SearchToolView';
@@ -16,8 +16,14 @@ export default class App extends React.Component {
     if (!auth) {
       return (
         <div className="please-auth">
-          <p>You have not authenticated with Spotify, or your authentication has expired.</p>
-          <button onClick={() => redirectToAuth()}>Authenticate</button>
+          {hasClientId() ? (
+            <>
+              <p>You have not authenticated with Spotify, or your authentication has expired.</p>
+              <button onClick={() => redirectToAuth()}>Authenticate</button>
+            </>
+          ) : (
+            <p>You have not configured a Spotify client ID.</p>
+          )}
         </div>
       );
     }
