@@ -1,5 +1,11 @@
 import * as qs from './utils/querystring';
 
+const clientId = `${import.meta.env.VITE_SPOTIFY_CLIENT_ID || ''}`;
+
+export function hasClientId() {
+  return !!clientId;
+}
+
 export function getAuth() {
   const auth = JSON.parse(sessionStorage.plsAuth || 'null');
   if (auth) {
@@ -12,9 +18,12 @@ export function getAuth() {
 }
 
 export function redirectToAuth() {
+  if (!clientId) {
+    throw new Error('Missing client ID.');
+  }
   location.href = `https://accounts.spotify.com/authorize?${qs.stringify({
     response_type: 'token',
-    client_id: `${import.meta.env.VITE_SPOTIFY_CLIENT_ID}`,
+    client_id: clientId,
     scope: [
       'user-read-private',
       'playlist-modify-private',
