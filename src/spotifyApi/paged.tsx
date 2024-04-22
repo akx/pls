@@ -36,7 +36,7 @@ export function loadPagedResource<TResource>(
           resolve(items);
         }
       } catch (e) {
-        return reject(e);
+        return reject(e instanceof Error ? e : new Error(String(e)));
       }
     }
 

@@ -6,13 +6,13 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-node@v4
-      with:
-        node-version: '14'
-        cache: 'yarn'
-    - run: yarn
-    - run: yarn build
-      env:
-        VITE_SPOTIFY_CLIENT_ID: dummy
-    - run: yarn lint
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '14'
+          cache: 'yarn'
+      - run: yarn
+      - run: yarn build
+        env:
+          VITE_SPOTIFY_CLIENT_ID: dummy
+      - run: yarn lint
