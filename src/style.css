@@ -67,7 +67,9 @@ body,
 input,
 button,
 select {
-  font: 11pt/1.1 'Inter', sans-serif;
+  font:
+    11pt/1.1 'Inter',
+    sans-serif;
 }
 
 table.visual-table {
