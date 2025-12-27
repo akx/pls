@@ -7,8 +7,11 @@ import PlaylistContentView from './views/PlaylistContentView';
 import SearchToolView from './views/SearchToolView';
 
 export default class App extends React.Component {
-  public UNSAFE_componentWillMount() {
-    checkAndSaveAuth();
+  public async componentDidMount() {
+    const auth = await checkAndSaveAuth();
+    if (auth) {
+      this.forceUpdate();
+    }
   }
 
   public render() {

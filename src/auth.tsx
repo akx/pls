@@ -17,39 +17,107 @@ export function getAuth() {
   return null;
 }
 
-export function redirectToAuth() {
+function generateCodeVerifier(): string {
+  const array = new Uint8Array(32);
+  crypto.getRandomValues(array);
+  return base64UrlEncode(array);
+}
+
+function base64UrlEncode(buffer: Uint8Array): string {
+  return btoa(String.fromCharCode(...buffer))
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+    .replace(/=+$/, '');
+}
+
+async function generateCodeChallenge(verifier: string): Promise<string> {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(verifier);
+  const hash = await crypto.subtle.digest('SHA-256', data);
+  return base64UrlEncode(new Uint8Array(hash));
+}
+
+function getRedirectUri() {
+  return location.href.replace(/[?#]+.*/g, '');
+}
+
+export async function redirectToAuth() {
   if (!clientId) {
     throw new Error('Missing client ID.');
   }
+
+  const codeVerifier = generateCodeVerifier();
+  const codeChallenge = await generateCodeChallenge(codeVerifier);
+  sessionStorage.plsCodeVerifier = codeVerifier;
+
+  const scope = [
+    'user-read-private',
+    'playlist-modify-private',
+    'playlist-modify-public',
+    'playlist-read-private',
+    'playlist-read-collaborative',
+  ].join(' ');
+
   location.href = `https://accounts.spotify.com/authorize?${qs.stringify({
-    response_type: 'token',
+    response_type: 'code',
     client_id: clientId,
-    scope: [
-      'user-read-private',
-      'playlist-modify-private',
-      'playlist-modify-public',
-      'playlist-read-private',
-      'playlist-read-collaborative',
-    ].join(' '),
-    // show_dialog: true,
-    redirect_uri: location.href.replace(/[?#]+.*/g, ''),
+    scope: scope,
+    redirect_uri: getRedirectUri(),
+    code_challenge_method: 'S256',
+    code_challenge: codeChallenge,
   })}`;
 }
 
-export function checkAndSaveAuth() {
-  const hqs = qs.parse(location.hash.replace(/^#/, ''));
-  if (hqs.access_token && hqs.token_type === 'Bearer') {
-    const auth = {
-      expiresAt: +new Date() + parseInt(`${hqs.expires_in}`, 10) * 1000,
-      ...hqs,
-    };
-    sessionStorage.plsAuth = JSON.stringify(auth);
-    location.hash = '';
-    return auth;
+export async function checkAndSaveAuth() {
+  const qps = qs.parse(location.search.replace(/^\?/, ''));
+
+  if (!qps.code) {
+    throw new Error("Didn't get a code...");
   }
-  return null;
+  const codeVerifier = sessionStorage.plsCodeVerifier;
+  if (!codeVerifier) {
+    console.error('No code verifier found in session storage');
+    return null;
+  }
+
+  const response = await fetch('https://accounts.spotify.com/api/token', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: qs.stringify({
+      grant_type: 'authorization_code',
+      code: qps.code,
+      redirect_uri: getRedirectUri(),
+      client_id: clientId,
+      code_verifier: codeVerifier,
+    }),
+  });
+
+  if (!response.ok) {
+    console.error('Token exchange failed:', response.status);
+    return null;
+  }
+
+  const data = await response.json();
+
+  const auth = {
+    access_token: data.access_token,
+    token_type: data.token_type,
+    expires_in: data.expires_in,
+    refresh_token: data.refresh_token,
+    expiresAt: +new Date() + parseInt(`${data.expires_in}`, 10) * 1000,
+  };
+
+  sessionStorage.plsAuth = JSON.stringify(auth);
+  delete sessionStorage.plsCodeVerifier;
+
+  window.history.replaceState({}, document.title, getRedirectUri());
+
+  return auth;
 }
 
 export function unauth() {
   sessionStorage.plsAuth = 'null';
+  delete sessionStorage.plsCodeVerifier;
 }
