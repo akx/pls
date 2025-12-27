@@ -2,7 +2,7 @@ import React from 'react';
 import PlaylistEntries from '../components/PlaylistEntries';
 import RequestStatus from '../components/RequestStatus';
 import Request from '../utils/request';
-import { RouteComponentProps } from 'react-router';
+import { RouteComponentProps } from 'react-router-dom';
 import { Playlist } from '../types/spotify';
 import { getPlaylist } from '../spotifyApi/playlists';
 

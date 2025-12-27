@@ -4,8 +4,8 @@ import { formatTitle } from '../utils/format';
 import { FilterProps } from './types';
 
 const NumericFiltersTable: React.FC<FilterProps> = ({ filters, setFilterValue }) => {
-  const lteFields: React.ReactChild[] = [];
-  const gteFields: React.ReactChild[] = [];
+  const lteFields: React.ReactElement[] = [];
+  const gteFields: React.ReactElement[] = [];
   NUMERIC_FILTER_FIELDS.forEach((f) => {
     gteFields.push(
       <td key={f}>
